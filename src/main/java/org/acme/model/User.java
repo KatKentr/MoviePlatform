@@ -1,9 +1,11 @@
 package org.acme.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -47,6 +49,39 @@ public class User {
 
     public void setMovies(Set<Movie> movies) {
         this.movies = movies;
+    }
+
+
+
+    @ManyToMany()
+    @JoinTable(name="users_follows",joinColumns = @JoinColumn(name="user_id",referencedColumnName = "id"),inverseJoinColumns=@JoinColumn(name="follows_user_id",referencedColumnName = "id"))
+    @JsonIgnore
+    private Set<User> following=new HashSet<>();
+
+    @ManyToMany(mappedBy="following")
+    private Set<User> followers=new HashSet<>();
+
+
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public Set<User> getFollowing() {
+        return following;
+    }
+
+    public void addFollowing(User newUserToFollow){   //add a new user that would like to follow
+
+        this.following.add(newUserToFollow);           //add to the list of teh following users
+        newUserToFollow.getFollowers().add(this);  //add to the list of followers of the newUserToFollow user
+
+    }
+
+    public void removeFollowing(User userToUnfollow) {
+
+        this.following.remove(userToUnfollow);
+        userToUnfollow.getFollowers().remove(this);
+
     }
 
 
@@ -95,8 +130,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
-
 
 
 
