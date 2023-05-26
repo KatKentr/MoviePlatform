@@ -9,6 +9,7 @@ import org.acme.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -53,6 +54,41 @@ public class UserService {
         return mapToDto(user);
 
     }
+
+    public void follow(Long userId, User userToFollow){
+
+        User user=userRepository.findById(userId);
+        User toFollow=userRepository.findById(userToFollow.getId());  //else throw userNotFoundException
+        user.addFollowing(toFollow);
+
+    }
+
+
+    public void unfollow(Long userId, Long toUnfollowId){
+        User user=userRepository.findById(userId);
+        User toFollow=userRepository.findById(toUnfollowId);  //else throw userNotFoundException
+        user.removeFollowing(toFollow);
+
+    }
+
+    //TO INVESTIGATE:should we query the database for these results??
+
+    public Set<User> getFollowers(Long userId){
+
+        return userRepository.findById(userId).getFollowers();
+
+    }
+
+    public Set<User> getFollowing(Long userId){
+
+        return userRepository.findById(userId).getFollowing();
+
+    }
+
+
+
+
+
 
 
     //TODO:retrieve by name
