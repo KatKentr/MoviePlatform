@@ -3,6 +3,7 @@ package org.acme.resource;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -71,6 +72,36 @@ public class UserResource {
 
         return Response.status(Response.Status.CREATED).build();
     }
+
+    @Transactional
+    @POST
+    @Path("/{userId}/movies")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addMovieToUser(@PathParam("userId") Long userId,@Valid MovieDto movieDto) throws ResourceNotFoundException {
+
+        userService.addMovieToUser(userId,movieDto);
+
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+
+    @GET
+    @Path("/{userId}/movies")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retrieveMoviesOfUser(@PathParam("userId") Long userId) throws ResourceNotFoundException {
+
+        //to implement
+        List<MovieDto> movieDtos=userService.getMoviesOfUser(userId);
+
+        return Response.ok(movieDtos).build();
+    }
+
+
+
+
+
 
 
 
