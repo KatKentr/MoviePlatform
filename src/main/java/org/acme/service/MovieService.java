@@ -23,11 +23,10 @@ public class MovieService {
 
 
     MovieRepository movieRepository;
-    UserRepository userRepository;
 
-    public MovieService(MovieRepository movieRepository, UserRepository userRepository){                //Does constructor-based injection take place or should i replace with @Inject?
+
+    public MovieService(MovieRepository movieRepository){                //Does constructor-based injection take place or should i replace with @Inject?
         this.movieRepository=movieRepository;
-        this.userRepository=userRepository;
     }
 
     public List<MovieDto> retrieveAllMovies(){     //return a list of MovieDtos
@@ -110,18 +109,6 @@ public class MovieService {
         return movieRepository.isPersistent(movie);
     }
 
-
-    //add a movie for a user
-    public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
-
-        //Movie movie=mapToEntity(movieDto);
-        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
-        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
-        Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
-        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
-        user.addMovie(movie);
-
-    }
 
     private MovieDto mapToDto(Movie movie){
         MovieDto movieDto = new MovieDto();

@@ -3,9 +3,12 @@ package org.acme.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
+import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
 import org.acme.exceptions.ResourceNotFoundException;
+import org.acme.model.Movie;
 import org.acme.model.User;
+import org.acme.repository.MovieRepository;
 import org.acme.repository.UserRepository;
 
 import java.util.List;
@@ -18,9 +21,12 @@ public class UserService {
 
     UserRepository userRepository;
 
-    public UserService(UserRepository userRepository){         //constructor-based injection
+    MovieRepository movieRepository;
+
+    public UserService(UserRepository userRepository, MovieRepository movieRepository){         //constructor-based injection
 
         this.userRepository=userRepository;
+        this.movieRepository=movieRepository;
 
     }
 
@@ -86,15 +92,22 @@ public class UserService {
 
     }
 
+    //add a movie for a user
+    public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
 
+        //Movie movie=mapToEntity(movieDto);
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
+        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
+        user.addMovie(movie);
 
-
+    }
 
 
 
     //TODO:retrieve by name
 
-    //TODO: add favorite movies to user
     //TODO:remove favorite movies from user
 
 
