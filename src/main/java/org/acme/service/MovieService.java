@@ -6,9 +6,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.Movie;
-import org.acme.model.User;
 import org.acme.repository.MovieRepository;
-import org.acme.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +30,7 @@ public class MovieService {
     public List<MovieDto> retrieveAllMovies(){     //return a list of MovieDtos
 
         List<Movie> movies=movieRepository.listAll();
-        List<MovieDto> moviesDto=movies.stream().map(m->mapToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
         return moviesDto;
 
 
@@ -49,7 +47,7 @@ public class MovieService {
 
           if (existsInDb(movie)){
 
-              return mapToDto(movie);
+              return mapMovieToDto(movie);
 
           } else {
 
@@ -62,13 +60,13 @@ public class MovieService {
 
         Optional<Movie> optional=movieRepository.findByIdOptional(id);
         Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+id+" does not exist"));
-        return mapToDto(movie);
+        return mapMovieToDto(movie);
     }
 
     public List<MovieDto> retrieveMoviesByCountry(String country){
 
         List<Movie> movies=movieRepository.findByCountry(country);
-        List<MovieDto> moviesDto=movies.stream().map(m->mapToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
         return moviesDto;
     }
 
@@ -76,7 +74,7 @@ public class MovieService {
     public List<MovieDto> retrieveMoviesByDirector(String director){
 
         List<Movie>  movies=movieRepository.findByDirector(director);
-        List<MovieDto> moviesDto=movies.stream().map(m->mapToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
         return moviesDto;
     }
 
@@ -84,7 +82,7 @@ public class MovieService {
 
         Optional<Movie> optional=movieRepository.findByTitle(title);
         Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+title+ " not found"));
-        return mapToDto(movie);
+        return mapMovieToDto(movie);
     }
 
 
@@ -110,7 +108,7 @@ public class MovieService {
     }
 
 
-    private MovieDto mapToDto(Movie movie){
+    public MovieDto mapMovieToDto(Movie movie){  //TODO: Not sure if these methods should be here: maybe specific classes for these mappings??
         MovieDto movieDto = new MovieDto();
         movieDto.setId(movie.getId());
         movieDto.setCountry(movie.getCountry());

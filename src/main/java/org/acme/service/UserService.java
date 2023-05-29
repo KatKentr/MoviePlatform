@@ -10,6 +10,7 @@ import org.acme.model.Movie;
 import org.acme.model.User;
 import org.acme.repository.MovieRepository;
 import org.acme.repository.UserRepository;
+import org.acme.service.MovieService;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +24,13 @@ public class UserService {
 
     MovieRepository movieRepository;
 
-    public UserService(UserRepository userRepository, MovieRepository movieRepository){         //constructor-based injection
+    MovieService movieService;
+
+    public UserService(UserRepository userRepository, MovieRepository movieRepository, MovieService movieService){         //constructor-based injection
 
         this.userRepository=userRepository;
         this.movieRepository=movieRepository;
+        this.movieService=movieService;
 
     }
 
@@ -104,6 +108,15 @@ public class UserService {
 
     }
 
+    public List<MovieDto> getMoviesOfUser(Long userId) throws ResourceNotFoundException {
+
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        List<MovieDto> movieDtos=user.getMovies().stream().map(m ->movieService.mapMovieToDto(m)).collect(Collectors.toList());
+        return movieDtos;
+
+    }
+
 
 
     //TODO:retrieve by name
@@ -117,7 +130,7 @@ public class UserService {
        userDto.setUsername(user.getUsername());
        userDto.setEmail(user.getEmail());
        userDto.setPassword(user.getPassword());
-       //Include also movies?
+       //TODO:Include also movies?
        return userDto;
     }
 
