@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
+import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.service.UserService;
 
@@ -28,6 +29,17 @@ public class UserResource {
         List<UserDto> usersDto = userService.retrieveAllUsers();
         return usersDto;
         //return Response.ok(movies).build();   //In this case, the return type of the method would be Response instead of List<Movie)
+    }
+
+
+    @GET                                        //retrieve user by id
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
+
+        UserDto userDto=userService.retrieveUserById(id);
+        return Response.ok(userDto).build();
+
     }
 
     @Transactional
