@@ -4,6 +4,7 @@ package org.acme.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.UserDto;
+import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.repository.UserRepository;
 
@@ -34,7 +35,7 @@ public class UserService {
 
         } else {
 
-            throw new NotFoundException();         //replace with user not found exception?
+            throw new NotFoundException();         //TODO: what a exception should be thrown in this case? i.e when an object is not saved in the db
         }
     }
 
@@ -48,9 +49,9 @@ public class UserService {
 
     }
 
-    public UserDto retrieveById(Long id){
+    public UserDto retrieveUserById(Long id) throws ResourceNotFoundException {
         Optional<User> optional=userRepository.findByIdOptional(id);
-        User user=optional.orElseThrow(() -> new NotFoundException()); //TODO:replace with user not found exception
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+id+" not found")); //TODO:replace with user not found exception
         return mapToDto(user);
 
     }
@@ -66,12 +67,12 @@ public class UserService {
 
     public void unfollow(Long userId, Long toUnfollowId){
         User user=userRepository.findById(userId);
-        User toFollow=userRepository.findById(toUnfollowId);  //else throw userNotFoundException
+        User toFollow=userRepository.findById(toUnfollowId);  //todo:else throw userNotFoundException
         user.removeFollowing(toFollow);
 
     }
 
-    //TO INVESTIGATE:should we query the database for these results??
+    //TO CHECK: Does Hibernate executes the sql queries in the backroound?
 
     public Set<User> getFollowers(Long userId){
 
