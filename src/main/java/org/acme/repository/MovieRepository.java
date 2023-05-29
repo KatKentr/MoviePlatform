@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.model.Movie;
 
 import java.util.List;
+import java.util.Optional;
 
 //Thought: support pagination? The process of diving a large dataset into smaller chunks(pages)
 @ApplicationScoped
@@ -17,8 +18,8 @@ public class MovieRepository implements PanacheRepository<Movie> {
 
     //custom finder method
 
-   public  List<Movie> findByTitle(String title){
-      return find("title",title).list();
+   public Optional<Movie> findByTitle(String title){
+      return find("title",title).firstResultOptional();
    }
 
    public  List<Movie> findByCountry(String country){

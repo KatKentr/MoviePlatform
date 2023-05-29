@@ -8,8 +8,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
-import org.acme.exceptions.MovieNotFoundException;
-import org.acme.model.Movie;
+import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.service.MovieService;
 
 import java.util.List;
@@ -63,7 +62,6 @@ public class MovieResource {
 //          return Response.status(NOT_FOUND).build();
 
         return Response.status(Response.Status.CREATED).entity(newMovieDto).build();
-
     }
 //TO DO: We have a @NotNull validation for the attributes in the entity clas. In case of null, application exits. Handle this situation
 
@@ -72,11 +70,11 @@ public class MovieResource {
     @GET
     @Path("/title/{title}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<MovieDto> getByTitle(@PathParam("title") String title){
+    public MovieDto getByTitle(@PathParam("title") String title) throws ResourceNotFoundException {
 
-        List<MovieDto> moviesDto=movieService.retrieveMoviesByTitle(title);
+        MovieDto movieDto=movieService.retrieveMovieByTitle(title);
 
-        return moviesDto;
+        return movieDto;
 
     }
 
@@ -94,7 +92,7 @@ public class MovieResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getById(@PathParam("id") Long id) throws MovieNotFoundException {    //returns a a movie dto
+    public Response getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
        MovieDto movieDto=movieService.retrieveMovieById(id);
         return Response.ok(movieDto).build();

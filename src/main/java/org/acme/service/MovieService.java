@@ -4,9 +4,11 @@ package org.acme.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
-import org.acme.exceptions.MovieNotFoundException;
+import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.Movie;
+import org.acme.model.User;
 import org.acme.repository.MovieRepository;
+import org.acme.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +23,11 @@ public class MovieService {
 
 
     MovieRepository movieRepository;
+    UserRepository userRepository;
 
-    public MovieService(MovieRepository movieRepository){                //Does constructor-based injection take place or should i replace with @Inject?
+    public MovieService(MovieRepository movieRepository, UserRepository userRepository){                //Does constructor-based injection take place or should i replace with @Inject?
         this.movieRepository=movieRepository;
+        this.userRepository=userRepository;
     }
 
     public List<MovieDto> retrieveAllMovies(){     //return a list of MovieDtos
@@ -55,10 +59,10 @@ public class MovieService {
     }
 
 
-    public MovieDto retrieveMovieById(Long id) throws MovieNotFoundException {
+    public MovieDto retrieveMovieById(Long id) throws ResourceNotFoundException {
 
         Optional<Movie> optional=movieRepository.findByIdOptional(id);
-        Movie movie=optional.orElseThrow(() -> new MovieNotFoundException("Movie with id: "+id+" does not exist"));
+        Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+id+" does not exist"));
         return mapToDto(movie);
     }
 
@@ -77,11 +81,11 @@ public class MovieService {
         return moviesDto;
     }
 
-    public List<MovieDto> retrieveMoviesByTitle(String title){   //There could be movies with the same name, right?
+    public MovieDto retrieveMovieByTitle(String title) throws ResourceNotFoundException {   //There could be movies with the same name, right?
 
-        List<Movie>  movies=movieRepository.findByTitle(title);
-        List<MovieDto> moviesDto=movies.stream().map(m->mapToDto(m)).collect(Collectors.toList());
-        return moviesDto;
+        Optional<Movie> optional=movieRepository.findByTitle(title);
+        Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+title+ " not found"));
+        return mapToDto(movie);
     }
 
 
@@ -104,6 +108,19 @@ public class MovieService {
     public boolean existsInDb(Movie movie){
 
         return movieRepository.isPersistent(movie);
+    }
+
+
+    //add a movie for a user
+    public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
+
+        //Movie movie=mapToEntity(movieDto);
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
+        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
+        user.addMovie(movie);
+
     }
 
     private MovieDto mapToDto(Movie movie){
