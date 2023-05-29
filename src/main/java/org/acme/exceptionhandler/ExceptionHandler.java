@@ -4,7 +4,7 @@ package org.acme.exceptionhandler;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import org.acme.exceptions.MovieNotFoundException;
+import org.acme.exceptions.ResourceNotFoundException;
 
 @Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
@@ -12,7 +12,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-        if(exception instanceof MovieNotFoundException) {
+        if(exception instanceof ResourceNotFoundException) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(new ErrorResponseBody(exception.getMessage()))
                     .build();
