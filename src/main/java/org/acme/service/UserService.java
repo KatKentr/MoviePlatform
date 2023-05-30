@@ -108,6 +108,22 @@ public class UserService {
 
     }
 
+    public void removeMovieFromUser(Long userId, Long movieId) throws ResourceNotFoundException {
+
+        Optional<User> optional=userRepository.findByIdOptional(userId);
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        Optional<Movie> optionalm=movieRepository.findByIdOptional(movieId);
+        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+movieId+" does not exist"));
+        if (user.getMovies().contains(movie)){
+
+            user.removeMovie(movie);
+        } else {
+
+            throw new ResourceNotFoundException("User with id "+userId+" has not added to their collection movie with id: "+movieId);
+        }
+
+    }
+
     public List<MovieDto> getMoviesOfUser(Long userId) throws ResourceNotFoundException {
 
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
@@ -120,8 +136,6 @@ public class UserService {
 
 
     //TODO:retrieve by name
-
-    //TODO:remove favorite movies from user
 
 
     private UserDto mapToDto(User user){
