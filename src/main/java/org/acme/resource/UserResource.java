@@ -75,7 +75,7 @@ public class UserResource {
 
     @Transactional
     @POST
-    @Path("/{userId}/movies")
+    @Path("/{userId}/movies")     //add a movie to a user
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addMovieToUser(@PathParam("userId") Long userId,@Valid MovieDto movieDto) throws ResourceNotFoundException {
@@ -88,7 +88,7 @@ public class UserResource {
 
     @GET
     @Path("/{userId}/movies")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)      //get the movies of a specific user
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveMoviesOfUser(@PathParam("userId") Long userId) throws ResourceNotFoundException {
 
@@ -96,6 +96,18 @@ public class UserResource {
         List<MovieDto> movieDtos=userService.getMoviesOfUser(userId);
 
         return Response.ok(movieDtos).build();
+    }
+
+    @Transactional
+    @DELETE
+    @Path("/{userId}/movies/{movieId}")
+    @Consumes(MediaType.APPLICATION_JSON)      //remove a movie form
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeMovieFromUser(@PathParam("userId") Long userId, @PathParam("movieId") Long movieId) throws ResourceNotFoundException {
+
+       userService.removeMovieFromUser(userId,movieId);
+                                                                       //TODO: provide link to retrieve movies of user. Similarly to Sping HATEOAS
+        return Response.ok(Response.Status.OK).build();
     }
 
 
