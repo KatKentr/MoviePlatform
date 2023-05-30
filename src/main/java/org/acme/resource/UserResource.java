@@ -1,10 +1,17 @@
 package org.acme.resource;
 
 
+import io.quarkus.hal.HalEntityWrapper;
+import io.quarkus.hal.HalLink;
+import io.quarkus.resteasy.reactive.links.InjectRestLinks;
+import io.quarkus.resteasy.reactive.links.RestLink;
+import io.quarkus.resteasy.reactive.links.RestLinkType;
+import io.quarkus.resteasy.reactive.links.RestLinksProvider;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
@@ -12,8 +19,10 @@ import org.acme.dto.UserDto;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.service.UserService;
+import org.jboss.resteasy.reactive.common.util.RestMediaType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Path("/users")
@@ -23,8 +32,11 @@ public class UserResource {
     private UserService userService;
 
 
+
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "all-users")           //declare the web links that will be returned
+    @InjectRestLinks                     //injecting web links into the response HTTP headers
     public List<UserDto> users() {
 
         List<UserDto> usersDto = userService.retrieveAllUsers();
@@ -35,11 +47,14 @@ public class UserResource {
 
     @GET                                        //retrieve user by id
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "self")      //the self link is not returned. If we return the UserDto object instead of the Response it may appear
+    @InjectRestLinks(RestLinkType.INSTANCE)
     public Response getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
         UserDto userDto=userService.retrieveUserById(id);
         return Response.ok(userDto).build();
+
 
     }
 
