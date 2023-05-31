@@ -74,19 +74,23 @@ public class UserService {
 
     }
 
-    public void follow(Long userId, User userToFollow){   //TODO: replace method's argument with Dto data type
+    public void follow(Long userId, User userToFollow) throws ResourceNotFoundException {   //TODO: replace method's argument with Dto data type
 
-        User user=userRepository.findById(userId);
-        User toFollow=userRepository.findById(userToFollow.getId());  //else throw userNotFoundException
+        Optional<User> userOptional=userRepository.findByIdOptional(userId);
+        User user=userOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userId+" not found"));
+        Optional<User> toFollowOptional=userRepository.findByIdOptional(userToFollow.getId());  //else throw userNotFoundException
+        User toFollow=toFollowOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userToFollow.getId()+" not found"));
         user.addFollowing(toFollow);
 
     }
 
 
-    public void unfollow(Long userId, Long toUnfollowId){
-        User user=userRepository.findById(userId);
-        User toFollow=userRepository.findById(toUnfollowId);  //todo:else throw userNotFoundException
-        user.removeFollowing(toFollow);
+    public void unfollow(Long userId, Long toUnfollowId) throws ResourceNotFoundException {
+        Optional<User> userOptional=userRepository.findByIdOptional(userId);
+        User user=userOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userId+" not found"));
+        Optional<User> toUnfollowOptional=userRepository.findByIdOptional(toUnfollowId);
+        User toUnfollow=toUnfollowOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+toUnfollowId+" not found"));
+        user.removeFollowing(toUnfollow); //TODO: should we check first that the user indeed follows the second user?
 
     }
 
