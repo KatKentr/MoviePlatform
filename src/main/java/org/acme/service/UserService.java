@@ -2,10 +2,12 @@ package org.acme.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
 import org.acme.exceptions.ResourceNotFoundException;
+import org.acme.mapper.UserMapper;
 import org.acme.model.Movie;
 import org.acme.model.User;
 import org.acme.repository.MovieRepository;
@@ -17,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
+@ApplicationScoped                 //an application-wide singleton that is “injectable”.
 public class UserService {
 
     UserRepository userRepository;
@@ -25,6 +27,10 @@ public class UserService {
     MovieRepository movieRepository;
 
     MovieService movieService;
+
+   @Inject
+    UserMapper userMapper;
+
 
     public UserService(UserRepository userRepository, MovieRepository movieRepository, MovieService movieService){         //constructor-based injection
 
@@ -36,12 +42,12 @@ public class UserService {
 
     public UserDto saveNewUser(UserDto userDto){
 
-        User user=mapToEntity(userDto);
+        User user=userMapper.toEntity(userDto);
         userRepository.persist(user);
 
         if (userRepository.isPersistent(user)){
 
-            return mapToDto(user);
+            return userMapper.toDTO(user);
 
         } else {
 
@@ -53,7 +59,8 @@ public class UserService {
     public List<UserDto> retrieveAllUsers(){
 
         List<User> users=userRepository.listAll();
-        List<UserDto> usersDto=users.stream().map(u->mapToDto(u)).collect(Collectors.toList());
+        List<UserDto> usersDto=users.stream().map(u->userMapper.toDTO(u)).collect(Collectors.toList());
+        //System.out.println(usersDto.get(0).getMovies());
         return usersDto;
 
 
@@ -61,12 +68,12 @@ public class UserService {
 
     public UserDto retrieveUserById(Long id) throws ResourceNotFoundException {
         Optional<User> optional=userRepository.findByIdOptional(id);
-        User user=optional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+id+" not found")); //TODO:replace with user not found exception
-        return mapToDto(user);
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+id+" not found"));
+        return userMapper.toDTO(user);
 
     }
 
-    public void follow(Long userId, User userToFollow){
+    public void follow(Long userId, User userToFollow){   //TODO: replace method's argument with Dto data type
 
         User user=userRepository.findById(userId);
         User toFollow=userRepository.findById(userToFollow.getId());  //else throw userNotFoundException
@@ -84,7 +91,7 @@ public class UserService {
 
     //TO CHECK: Does Hibernate executes the sql queries in the backroound?
 
-    public Set<User> getFollowers(Long userId){
+    public Set<User> getFollowers(Long userId){         //TODO: return dto data type
 
         return userRepository.findById(userId).getFollowers();
 
@@ -99,7 +106,6 @@ public class UserService {
     //add a movie for a user
     public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
 
-        //Movie movie=mapToEntity(movieDto);
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
@@ -136,28 +142,6 @@ public class UserService {
 
 
     //TODO:retrieve by name
-
-
-    private UserDto mapToDto(User user){
-       UserDto userDto=new UserDto();
-       userDto.setId(user.getId());
-       userDto.setUsername(user.getUsername());
-       userDto.setEmail(user.getEmail());
-       userDto.setPassword(user.getPassword());
-       //TODO:Include also movies?
-       return userDto;
-    }
-
-
-    private User mapToEntity(UserDto userDto){
-
-      User user=new User();
-      user.setUsername(userDto.getUsername());
-      user.setEmail(userDto.getEmail());
-      user.setPassword(userDto.getPassword());
-      return user;
-
-    }
 
 
 
