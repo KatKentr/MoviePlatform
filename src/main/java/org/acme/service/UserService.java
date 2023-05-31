@@ -7,6 +7,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
 import org.acme.exceptions.ResourceNotFoundException;
+import org.acme.mapper.MovieMapper;
 import org.acme.mapper.UserMapper;
 import org.acme.model.Movie;
 import org.acme.model.User;
@@ -26,17 +27,17 @@ public class UserService {
 
     MovieRepository movieRepository;
 
-    MovieService movieService;
-
    @Inject
     UserMapper userMapper;
 
+   @Inject
+    MovieMapper movieMapper;
 
-    public UserService(UserRepository userRepository, MovieRepository movieRepository, MovieService movieService){         //constructor-based injection
+
+    public UserService(UserRepository userRepository, MovieRepository movieRepository){         //constructor-based injection
 
         this.userRepository=userRepository;
         this.movieRepository=movieRepository;
-        this.movieService=movieService;
 
     }
 
@@ -134,7 +135,7 @@ public class UserService {
 
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
-        List<MovieDto> movieDtos=user.getMovies().stream().map(m ->movieService.mapMovieToDto(m)).collect(Collectors.toList());
+        List<MovieDto> movieDtos=user.getMovies().stream().map(m ->movieMapper.toDto(m)).collect(Collectors.toList());
         return movieDtos;
 
     }

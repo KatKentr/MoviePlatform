@@ -2,9 +2,11 @@ package org.acme.service;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.exceptions.ResourceNotFoundException;
+import org.acme.mapper.MovieMapper;
 import org.acme.model.Movie;
 import org.acme.repository.MovieRepository;
 
@@ -23,6 +25,10 @@ public class MovieService {
     MovieRepository movieRepository;
 
 
+    @Inject
+    MovieMapper movieMapper;
+
+
     public MovieService(MovieRepository movieRepository){                //Does constructor-based injection take place or should i replace with @Inject?
         this.movieRepository=movieRepository;
     }
@@ -30,7 +36,7 @@ public class MovieService {
     public List<MovieDto> retrieveAllMovies(){     //return a list of MovieDtos
 
         List<Movie> movies=movieRepository.listAll();
-        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> movieMapper.toDto(m)).collect(Collectors.toList());
         return moviesDto;
 
 
@@ -38,7 +44,8 @@ public class MovieService {
 
     public MovieDto saveNewMovie(MovieDto movieDto){        //returns a MovieDto
 
-         Movie movie=mapToEntity(movieDto);
+
+        Movie movie=movieMapper.toEntity(movieDto);
 
             //movie.persist();
            movieRepository.persist(movie);
@@ -47,7 +54,7 @@ public class MovieService {
 
           if (existsInDb(movie)){
 
-              return mapMovieToDto(movie);
+              return movieMapper.toDto(movie);
 
           } else {
 
@@ -60,13 +67,13 @@ public class MovieService {
 
         Optional<Movie> optional=movieRepository.findByIdOptional(id);
         Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+id+" does not exist"));
-        return mapMovieToDto(movie);
+        return movieMapper.toDto(movie);
     }
 
     public List<MovieDto> retrieveMoviesByCountry(String country){
 
         List<Movie> movies=movieRepository.findByCountry(country);
-        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> movieMapper.toDto(m)).collect(Collectors.toList());
         return moviesDto;
     }
 
@@ -74,7 +81,7 @@ public class MovieService {
     public List<MovieDto> retrieveMoviesByDirector(String director){
 
         List<Movie>  movies=movieRepository.findByDirector(director);
-        List<MovieDto> moviesDto=movies.stream().map(m-> mapMovieToDto(m)).collect(Collectors.toList());
+        List<MovieDto> moviesDto=movies.stream().map(m-> movieMapper.toDto(m)).collect(Collectors.toList());
         return moviesDto;
     }
 
@@ -82,7 +89,7 @@ public class MovieService {
 
         Optional<Movie> optional=movieRepository.findByTitle(title);
         Movie movie=optional.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+title+ " not found"));
-        return mapMovieToDto(movie);
+        return movieMapper.toDto(movie);
     }
 
 
@@ -108,27 +115,6 @@ public class MovieService {
     }
 
 
-    public MovieDto mapMovieToDto(Movie movie){  //TODO: Not sure if these methods should be here: maybe specific classes for these mappings??
-        MovieDto movieDto = new MovieDto();
-        movieDto.setId(movie.getId());
-        movieDto.setCountry(movie.getCountry());
-        movieDto.setDescription(movie.getDescription());
-        movieDto.setTitle(movie.getTitle());
-        movieDto.setDirector(movie.getDirector());
-        return movieDto;
-    }
-
-
-    private Movie mapToEntity(MovieDto movieDto){
-
-        Movie movie=new Movie();
-        movie.setTitle(movieDto.getTitle());
-        movie.setCountry(movieDto.getCountry());
-        movie.setDescription(movieDto.getDescription());
-        movie.setDirector(movieDto.getDirector());
-        return movie;
-
-    }
 
 
 
