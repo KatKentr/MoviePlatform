@@ -81,12 +81,27 @@ public class UserResource {
     @Path("/{userId}/follows")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newUserToFollow(@PathParam("userId") Long userId,User userToFollow) {
+    public Response newUserToFollow(@PathParam("userId") Long userId,User userToFollow) throws ResourceNotFoundException {
 
         userService.follow(userId,userToFollow);
 
         return Response.status(Response.Status.CREATED).build();
     }
+
+    @Transactional
+    @DELETE
+    @Path("/{userId}/follows/{userIdToUnfollow}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unfollowUser(@PathParam("userId") Long userId,@PathParam("userIdToUnfollow")Long userIdToUnfollow) throws ResourceNotFoundException {
+
+        userService.unfollow(userId,userIdToUnfollow);
+
+        return Response.status(Response.Status.OK).build();
+    }
+
+
+
 
     @Transactional
     @POST
