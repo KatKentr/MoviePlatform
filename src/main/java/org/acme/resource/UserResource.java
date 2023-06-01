@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
+import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.service.UserService;
@@ -59,10 +60,24 @@ public class UserResource {
     }
 
     @Transactional
+    @DELETE                                        //retrieve user by id
+    @Path("/{id}")
+    @Produces({MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "self")      //the self link is not returned. If we return the UserDto object instead of the Response it may appear
+    @InjectRestLinks(RestLinkType.INSTANCE)
+    public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
+
+        userService.deleteUserById(id);
+        return Response.ok().build();
+
+
+    }
+
+    @Transactional
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newUser(UserDto userDto) {        //returns a userDto
+    public Response newUser(UserDto userDto) throws DuplicateResourceException {        //returns a userDto
 
         UserDto newUserDto = userService.saveNewUser(userDto);
 //          movieService.saveNewMovie();
@@ -89,7 +104,7 @@ public class UserResource {
     }
 
     @Transactional
-    @DELETE
+    @DELETE                                                            //TODO: User is deleted , however we recieve status 500, internal server error. Check this out
     @Path("/{userId}/follows/{userIdToUnfollow}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
