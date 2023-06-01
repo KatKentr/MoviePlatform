@@ -5,6 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
+import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.mapper.MovieMapper;
 import org.acme.model.Movie;
@@ -42,11 +43,16 @@ public class MovieService {
 
     }
 
-    public MovieDto saveNewMovie(MovieDto movieDto){        //returns a MovieDto
+    public MovieDto saveNewMovie(MovieDto movieDto) throws DuplicateResourceException {        //returns a MovieDto
 
+        Optional<Movie> opt=movieRepository.findByTitle(movieDto.getTitle());
+
+        if (!opt.isEmpty()){
+
+            throw new DuplicateResourceException("movie with title"+movieDto.getTitle()+" already exists");
+        }
 
         Movie movie=movieMapper.toEntity(movieDto);
-
             //movie.persist();
            movieRepository.persist(movie);
 

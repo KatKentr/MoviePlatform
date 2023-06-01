@@ -8,6 +8,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
+import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.service.MovieService;
 
@@ -52,7 +53,7 @@ public class MovieResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newMovie(@Valid MovieDto movieDto){        //returns a movieDto
+    public Response newMovie(@Valid MovieDto movieDto) throws DuplicateResourceException {        //returns a movieDto
 
           MovieDto newMovieDto=movieService.saveNewMovie(movieDto);
 //          movieService.saveNewMovie();
