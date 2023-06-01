@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
+import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.mapper.MovieMapper;
 import org.acme.mapper.UserMapper;
@@ -41,7 +42,17 @@ public class UserService {
 
     }
 
-    public UserDto saveNewUser(UserDto userDto){
+    public UserDto saveNewUser(UserDto userDto) throws DuplicateResourceException {
+
+        if (userRepository.existsbyEmail(userDto.getEmail())){
+
+            throw new DuplicateResourceException("User with email "+userDto.getEmail()+" already exists");
+        }
+
+        if (userRepository.existsbyUsername(userDto.getUsername())){
+
+            throw new DuplicateResourceException("Username "+userDto.getUsername()+" is already taken");
+        }
 
         User user=userMapper.toEntity(userDto);
         userRepository.persist(user);
@@ -52,7 +63,7 @@ public class UserService {
 
         } else {
 
-            throw new NotFoundException();         //TODO: what a exception should be thrown in this case? i.e when an object is not saved in the db
+            throw new NotFoundException();         //TODO: should we check that the object is persisted at this point? or scope of unit test? what a exception should be thrown in this case? i.e when an object is not saved in the db
         }
     }
 
@@ -144,6 +155,17 @@ public class UserService {
 
     }
 
+    public void deleteUserById(Long userId) throws ResourceNotFoundException {
+
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+
+        if (optional.isEmpty()){
+
+            throw new ResourceNotFoundException("User with id: "+userId+" does not exist");
+        }
+        userRepository.deleteById(userId);
+
+    }
 
 
     //TODO:retrieve by name
