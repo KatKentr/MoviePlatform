@@ -1,6 +1,7 @@
 package org.acme.resource;
 
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.quarkus.hal.HalEntityWrapper;
 import io.quarkus.hal.HalLink;
 import io.quarkus.resteasy.reactive.links.InjectRestLinks;
@@ -20,6 +21,8 @@ import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.service.UserService;
+import org.jboss.resteasy.reactive.ResponseStatus;
+import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.common.util.RestMediaType;
 
 import java.util.List;
@@ -49,22 +52,20 @@ public class UserResource {
     @GET                                        //retrieve user by id
     @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
-    @RestLink(rel = "self")      //the self link is not returned. If we return the UserDto object instead of the Response it may appear
+    @RestLink(rel = "self")      //the self link is not returned, If we return the UserDto object instead of the Response it appears
     @InjectRestLinks(RestLinkType.INSTANCE)
-    public Response getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
+    @ResponseStatus(value= 200)
+    public UserDto getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
         UserDto userDto=userService.retrieveUserById(id);
-        return Response.ok(userDto).build();
-
+        //return Response.ok(userDto).build();
+        return userDto;
 
     }
 
     @Transactional
-    @DELETE                                        //retrieve user by id
+    @DELETE                                        //delete user by id
     @Path("/{id}")
-    @Produces({MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
-    @RestLink(rel = "self")      //the self link is not returned. If we return the UserDto object instead of the Response it may appear
-    @InjectRestLinks(RestLinkType.INSTANCE)
     public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
         userService.deleteUserById(id);
@@ -76,7 +77,8 @@ public class UserResource {
     @Transactional
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON,RestMediaType.APPLICATION_HAL_JSON})
+    @InjectRestLinks(RestLinkType.INSTANCE)   //injecting the URI for the created resource and the link to retrieve all-users into the response HTTP headers
     public Response newUser(UserDto userDto) throws DuplicateResourceException {        //returns a userDto
 
         UserDto newUserDto = userService.saveNewUser(userDto);
@@ -87,6 +89,7 @@ public class UserResource {
 //          return Response.status(NOT_FOUND).build();
 
         return Response.status(Response.Status.CREATED).entity(newUserDto).build();
+
 
     }
 
@@ -104,7 +107,7 @@ public class UserResource {
     }
 
     @Transactional
-    @DELETE                                                            //TODO: User is deleted , however we recieve status 500, internal server error. Check this out
+    @DELETE
     @Path("/{userId}/follows/{userIdToUnfollow}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -154,13 +157,6 @@ public class UserResource {
                                                                        //TODO: provide link to retrieve movies of user. Similarly to Sping HATEOAS
         return Response.ok(Response.Status.OK).build();
     }
-
-
-
-
-
-
-
 
     @GET
     @Path("/{userId}/followers")
