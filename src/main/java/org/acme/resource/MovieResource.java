@@ -1,6 +1,9 @@
 package org.acme.resource;
 
 
+import io.quarkus.resteasy.reactive.links.InjectRestLinks;
+import io.quarkus.resteasy.reactive.links.RestLink;
+import io.quarkus.resteasy.reactive.links.RestLinkType;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -11,6 +14,8 @@ import org.acme.dto.MovieDto;
 import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.service.MovieService;
+import org.jboss.resteasy.reactive.ResponseStatus;
+import org.jboss.resteasy.reactive.common.util.RestMediaType;
 
 import java.util.List;
 
@@ -37,6 +42,8 @@ public class MovieResource {
     //example of a GET REST endpoint to use a QueryParam curl localhost:8080/movies?director=Fatih Akim
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @RestLink(rel = "all-movies")           //declare the web link to retrieve all movies
+    @InjectRestLinks
     public List<MovieDto> movies(@QueryParam("director") String director){
         if (director!=null){
             return movieService.retrieveMoviesByDirector(director);
@@ -64,7 +71,7 @@ public class MovieResource {
 
         return Response.status(Response.Status.CREATED).entity(newMovieDto).build();
     }
-//TO DO: We have a @NotNull validation for the attributes in the entity clas. In case of null, application exits. Handle this situation
+
 
     //retrieve movie by title
 
@@ -92,11 +99,15 @@ public class MovieResource {
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
+    @Produces({MediaType.APPLICATION_JSON, RestMediaType.APPLICATION_HAL_JSON })
+    @RestLink(rel = "self")
+    @InjectRestLinks(RestLinkType.INSTANCE)               //provide links to the consumer of the api to retrieve all movies
+    @ResponseStatus(value= 200)
+    public MovieDto getById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
        MovieDto movieDto=movieService.retrieveMovieById(id);
-        return Response.ok(movieDto).build();
+        //return Response.ok(movieDto).build();
+        return movieDto;
 
     }
 
@@ -104,8 +115,8 @@ public class MovieResource {
     @Transactional
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteById(@PathParam("id") Long id){
+    //@Produces(MediaType.APPLICATION_JSON)
+    public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {
 
         Boolean deleted=movieService.deleteMovieById(id);
         return deleted ? Response.noContent().build() : Response.status(BAD_REQUEST).build();

@@ -9,10 +9,12 @@ import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.mapper.MovieMapper;
 import org.acme.model.Movie;
+import org.acme.model.User;
 import org.acme.repository.MovieRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 //https://github.com/GiuseppeScaramuzzino/quarkus-hibernate-orm-panache-repository/blob/main/src/main/java/org/gs/MovieResource.java
@@ -99,7 +101,14 @@ public class MovieService {
     }
 
 
-    public boolean deleteMovieById(Long id){
+    public boolean deleteMovieById(Long id) throws ResourceNotFoundException {
+
+        Optional<Movie> optional=movieRepository.findByIdOptional(id);
+        Movie movie=optional.orElseThrow(() ->new ResourceNotFoundException("Movie with title: "+id+ " not found"));
+        Set<User> users=movie.getUsers();
+        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
+                users.stream().forEach(u -> u.removeMovie(movie));         // remove this user from each user's collection
+        }
 
       return movieRepository.deleteById(id);
 
