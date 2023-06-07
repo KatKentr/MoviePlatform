@@ -12,7 +12,9 @@ import org.acme.mapper.MovieMapper;
 import org.acme.mapper.UserMapper;
 import org.acme.model.Movie;
 import org.acme.model.User;
+import org.acme.model.UserMovie;
 import org.acme.repository.MovieRepository;
+import org.acme.repository.UserMovieRepository;
 import org.acme.repository.UserRepository;
 import org.acme.service.MovieService;
 
@@ -33,6 +35,11 @@ public class UserService {
 
    @Inject
     MovieMapper movieMapper;
+
+
+
+   @Inject
+   UserMovieRepository userMovieRepository;
 
 
     public UserService(UserRepository userRepository, MovieRepository movieRepository){         //constructor-based injection
@@ -126,29 +133,106 @@ public class UserService {
     }
 
     //add a movie for a user
+//    public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
+//
+//        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+//        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+//        Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
+//        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
+//        user.addMovie(movie);
+//
+//    }
+//
+//    public void removeMovieFromUser(Long userId, Long movieId) throws ResourceNotFoundException {
+//
+//        Optional<User> optional=userRepository.findByIdOptional(userId);
+//        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+//        Optional<Movie> optionalm=movieRepository.findByIdOptional(movieId);
+//        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+movieId+" does not exist"));
+//        if (user.getMovies().contains(movie)){
+//
+//            user.removeMovie(movie);
+//        } else {
+//
+//            throw new ResourceNotFoundException("User with id "+userId+" has not added to their collection movie with id: "+movieId);
+//        }
+//
+//    }
+//
+//    public List<MovieDto> getMoviesOfUser(Long userId) throws ResourceNotFoundException {
+//
+//        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+//        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+//        List<MovieDto> movieDtos=user.getMovies().stream().map(m ->movieMapper.toDto(m)).collect(Collectors.toList());
+//        return movieDtos;
+//
+//    }
+
+//implementation of the add movie to user functionality with the new join table that contains extra columns except for the two primary keys
+
+   // It works!!
+
+//    public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
+//
+//        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+//        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+//        Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
+//        Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
+//
+//        UserMovie.UserMovieId userMovieId=new UserMovie.UserMovieId(user.getId(), movie.getId());
+//        UserMovie userMovie=new UserMovie();
+//        userMovie.setPrimaryKey(userMovieId);
+//        userMovie.setMovie(movie);
+//        userMovie.setUser(user);
+//
+//        userMovieRepository.persist(userMovie);        //save the user-movie association in the users_movies table
+//
+//    }
+//
+//    public void removeMovieFromUser(Long userId, Long movieId) throws ResourceNotFoundException { //TODO:See the method implemented in UserMovieRepository
+//
+//        UserMovie.UserMovieId userMovieId=new UserMovie.UserMovieId(userId, movieId);
+//        //Optional<UserMovie> optionalm=userMovieRepository.findByCompositePrimaryKey(userId,movieId);   //find movie        how can we remove it??
+//        Optional<UserMovie> optionalm=userMovieRepository.findByCompositePrimaryKey(userMovieId);
+//        UserMovie userMovie=optionalm.orElseThrow(() -> new ResourceNotFoundException("exception"));
+//        userMovieRepository.delete(userMovie);   //remove entry from users_movies table
+//
+//    }
+//
+//        public List<MovieDto> getMoviesOfUser(Long userId) throws ResourceNotFoundException {
+//
+//        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+//        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+//        List<UserMovie> moviesOfUser=userMovieRepository.findByUser(user);
+//        List<MovieDto> movieDtos=moviesOfUser.stream().map( x-> movieMapper.toDto(x.getMovie())).collect(Collectors.toList());
+//        return movieDtos;
+//
+//    }
+
+
+    //implementation inspired from https://vladmihalcea.com/the-best-way-to-map-a-many-to-many-association-with-extra-columns-when-using-jpa-and-hibernate/
+    //Note: the following methods now work as expected. We can add an existing movie to the user, remove the movie form the user, and retrieve movies for the user
+    //TODO:If we delete a user all the entries in the  users_movies table should be deleted, but not the movies! . It works!!!
+    //TODO: if we delete a movie all the entries in the users_movies table associated with this movie should be deleted, but not the users! It works!
+
     public void addMovieToUser(Long userId, MovieDto movieDto) throws ResourceNotFoundException {
 
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         Optional<Movie> optionalm=movieRepository.findByTitle(movieDto.getTitle());   //find movie
         Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with title: "+movieDto.getTitle()+" does not exist"));
-        user.addMovie(movie);
 
+        user.addMovie(movie);
     }
 
-    public void removeMovieFromUser(Long userId, Long movieId) throws ResourceNotFoundException {
+
+        public void removeMovieFromUser(Long userId, Long movieId) throws ResourceNotFoundException { //TODO:See the method implemented in UserMovieRepository
 
         Optional<User> optional=userRepository.findByIdOptional(userId);
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         Optional<Movie> optionalm=movieRepository.findByIdOptional(movieId);
         Movie movie=optionalm.orElseThrow(() -> new ResourceNotFoundException("Movie with id: "+movieId+" does not exist"));
-        if (user.getMovies().contains(movie)){
-
-            user.removeMovie(movie);
-        } else {
-
-            throw new ResourceNotFoundException("User with id "+userId+" has not added to their collection movie with id: "+movieId);
-        }
+        user.removeMovie(movie);
 
     }
 
@@ -156,10 +240,34 @@ public class UserService {
 
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
-        List<MovieDto> movieDtos=user.getMovies().stream().map(m ->movieMapper.toDto(m)).collect(Collectors.toList());
+        //List<UserMovie> moviesOfUser=userMovieRepository.findByUser(user);
+        List<MovieDto> movieDtos=user.getMovies().stream().map( x-> movieMapper.toDto(x.getMovie())).collect(Collectors.toList());
         return movieDtos;
 
     }
+
+    //TODO: add review and rate to a movie
+
+    public void addRateToMovie(Long userId, Long movieId,int rate) throws ResourceNotFoundException {
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?
+        Optional<UserMovie> optUserMovie=user.getMovies().stream().filter( x -> x.getMovie().getId()==movieId).findFirst();
+        UserMovie userMovie=optUserMovie.orElseThrow(() -> new ResourceNotFoundException("User has not added movie with id: "+movieId+" in their collection"));
+        userMovie.setRate(rate);
+        //TODO: how we could display the movie with this information?
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     public void deleteUserById(Long userId) throws ResourceNotFoundException {
 
