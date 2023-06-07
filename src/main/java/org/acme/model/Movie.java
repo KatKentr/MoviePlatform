@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -13,7 +15,7 @@ import java.util.Set;
 public class Movie  {      //We are not creating getters and setters and we are not providing an @Id: Panache feature
                                                  //By extending PanacheEntity, we’re using the Active Record persistence pattern instead of a DAO. This means that all persistence methods are blended with our own Entity.
   @Id
-  @GeneratedValue
+  @GeneratedValue                  //entity identifier
    private Long id;
 
    @NotNull
@@ -30,15 +32,26 @@ public class Movie  {      //We are not creating getters and setters and we are 
 
 
    //we want to get the users who like a movie. Bidirectional Many-to-Many relationship
-    @ManyToMany(mappedBy = "movies")
-    //The property mappedBy has the value movies which represents the property movies in the file User.java.
-    @JsonIgnore
-    private Set<User> users;
+//    @ManyToMany(mappedBy = "movies")
+//    //The property mappedBy has the value movies which represents the property movies in the file User.java.
+//    @JsonIgnore
+//    private Set<User> users;
+//
+//
+//    public Set<User> getUsers() { //Do we also need a setter?
+//        return users;
+//    }
+
+    //According to: https://vladmihalcea.com/the-best-way-to-map-a-many-to-many-association-with-extra-columns-when-using-jpa-and-hibernate/
+
+    @OneToMany(
+            mappedBy = "movie"
+//            cascade = CascadeType.ALL,   //do we need this?
+//            orphanRemoval = true
+    )
+    private List<UserMovie> users=new ArrayList<>();
 
 
-    public Set<User> getUsers() { //Do we also need a setter?
-        return users;
-    }
 
     public Movie(){
 
@@ -86,5 +99,13 @@ public class Movie  {      //We are not creating getters and setters and we are 
 
 
 
+   //getters and setters for the list of UserMovie instances
 
+    public List<UserMovie> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<UserMovie> users) {
+        this.users = users;
+    }
 }

@@ -134,6 +134,21 @@ public class UserResource {
     }
 
 
+    //user adds rate to movie
+    @Transactional
+    @PATCH
+    @Path("/{userId}/movies/{movieId}/rate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, int rate) throws ResourceNotFoundException {
+
+        userService.addRateToMovie(userId,movieId,rate);
+
+        return Response.ok().build();
+    }
+
+
+
+
     @GET
     @Path("/{userId}/movies")
     @Consumes(MediaType.APPLICATION_JSON)      //get the movies of a specific user
@@ -150,7 +165,7 @@ public class UserResource {
     @DELETE
     @Path("/{userId}/movies/{movieId}")
     @Consumes(MediaType.APPLICATION_JSON)      //remove a movie form
-    @Produces(MediaType.APPLICATION_JSON)
+    //@Produces(MediaType.APPLICATION_JSON)
     public Response removeMovieFromUser(@PathParam("userId") Long userId, @PathParam("movieId") Long movieId) throws ResourceNotFoundException {
 
        userService.removeMovieFromUser(userId,movieId);

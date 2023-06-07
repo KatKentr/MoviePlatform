@@ -10,7 +10,9 @@ import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.mapper.MovieMapper;
 import org.acme.model.Movie;
 import org.acme.model.User;
+import org.acme.model.UserMovie;
 import org.acme.repository.MovieRepository;
+import org.acme.repository.UserMovieRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,10 @@ public class MovieService {
 
     @Inject
     MovieMapper movieMapper;
+
+
+    @Inject
+    UserMovieRepository userMovieRepository;
 
 
     public MovieService(MovieRepository movieRepository){                //Does constructor-based injection take place or should i replace with @Inject?
@@ -101,16 +107,48 @@ public class MovieService {
     }
 
 
-    public boolean deleteMovieById(Long id) throws ResourceNotFoundException {
+//    public boolean deleteMovieById(Long id) throws ResourceNotFoundException {
+//
+//        Optional<Movie> optional=movieRepository.findByIdOptional(id);
+//        Movie movie=optional.orElseThrow(() ->new ResourceNotFoundException("Movie with title: "+id+ " not found"));
+//        Set<User> users=movie.getUsers();
+//        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
+//                users.stream().forEach(u -> u.removeMovie(movie));         // remove this user from each user's collection
+//        }
+//
+//      return movieRepository.deleteById(id);
+//
+//       //QUESTION
+//       //or:
+////        Movie entity=movieRepository.findById(id);
+////        if (entity==null){
+////
+////            throw new NotFoundException();
+////        }
+////
+////        movieRepository.delete(entity);
+//
+//    }
+
+
+
+
+        public void deleteMovieById(Long id) throws ResourceNotFoundException {
 
         Optional<Movie> optional=movieRepository.findByIdOptional(id);
         Movie movie=optional.orElseThrow(() ->new ResourceNotFoundException("Movie with title: "+id+ " not found"));
-        Set<User> users=movie.getUsers();
-        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
-                users.stream().forEach(u -> u.removeMovie(movie));         // remove this user from each user's collection
-        }
+//        List<UserMovie> users=movie.getUsers();
+//        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
+//                users.stream().map(x -> x.getUser()).forEach(u -> {System.out.println(u.getUsername());u.getMovies().stream().forEach( m->System.out.println("before movie removal "+m.getMovie().getTitle()));u.removeMovie(movie);u.getMovies().stream().forEach( m->System.out.println("after movie removal "+m.getMovie().getTitle()));});
+//            //users.stream().map(x -> x.getUser()).forEach(u -> {System.out.println(u.getUsername());u.removeMovie(movie);});
+//        }
 
-      return movieRepository.deleteById(id);
+        userMovieRepository.deleteByMovie(movie);
+        movieRepository.deleteById(id);
+
+
+
+       //movieRepository.deleteById(id);
 
        //QUESTION
        //or:

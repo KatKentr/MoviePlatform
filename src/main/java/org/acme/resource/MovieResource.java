@@ -118,8 +118,11 @@ public class MovieResource {
     //@Produces(MediaType.APPLICATION_JSON)
     public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {
 
-        Boolean deleted=movieService.deleteMovieById(id);
-        return deleted ? Response.noContent().build() : Response.status(BAD_REQUEST).build();
+//        Boolean deleted=movieService.deleteMovieById(id);
+//        return deleted ? Response.noContent().build() : Response.status(BAD_REQUEST).build();
+        movieService.deleteMovieById(id);
+        //return Response.noContent().build();
+        return Response.ok().build();
 
     }
 
