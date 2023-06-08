@@ -19,9 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//https://github.com/GiuseppeScaramuzzino/quarkus-hibernate-orm-panache-repository/blob/main/src/main/java/org/gs/MovieResource.java
-//https://redhat-developer-demos.github.io/quarkus-tutorial/quarkus-tutorial/panache.html
-//https://quarkus.io/guides/transaction
 
 @ApplicationScoped
 public class MovieService {
@@ -38,7 +35,7 @@ public class MovieService {
     UserMovieRepository userMovieRepository;
 
 
-    public MovieService(MovieRepository movieRepository){                //Does constructor-based injection take place or should i replace with @Inject?
+    public MovieService(MovieRepository movieRepository){                //constructor-based injection
         this.movieRepository=movieRepository;
     }
 
@@ -57,7 +54,7 @@ public class MovieService {
 
         if (!opt.isEmpty()){
 
-            throw new DuplicateResourceException("movie with title"+movieDto.getTitle()+" already exists");
+            throw new DuplicateResourceException("movie with title "+movieDto.getTitle()+" already exists");
         }
 
         Movie movie=movieMapper.toEntity(movieDto);
@@ -107,58 +104,19 @@ public class MovieService {
     }
 
 
-//    public boolean deleteMovieById(Long id) throws ResourceNotFoundException {
-//
-//        Optional<Movie> optional=movieRepository.findByIdOptional(id);
-//        Movie movie=optional.orElseThrow(() ->new ResourceNotFoundException("Movie with title: "+id+ " not found"));
-//        Set<User> users=movie.getUsers();
-//        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
-//                users.stream().forEach(u -> u.removeMovie(movie));         // remove this user from each user's collection
-//        }
-//
-//      return movieRepository.deleteById(id);
-//
-//       //QUESTION
-//       //or:
-////        Movie entity=movieRepository.findById(id);
-////        if (entity==null){
-////
-////            throw new NotFoundException();
-////        }
-////
-////        movieRepository.delete(entity);
-//
-//    }
-
-
-
 
         public void deleteMovieById(Long id) throws ResourceNotFoundException {
 
         Optional<Movie> optional=movieRepository.findByIdOptional(id);
         Movie movie=optional.orElseThrow(() ->new ResourceNotFoundException("Movie with title: "+id+ " not found"));
 //        List<UserMovie> users=movie.getUsers();
-//        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association
+//        if (!users.isEmpty())   {   //if this movie is associated with users. We have to remove the association. This approach did not work though
 //                users.stream().map(x -> x.getUser()).forEach(u -> {System.out.println(u.getUsername());u.getMovies().stream().forEach( m->System.out.println("before movie removal "+m.getMovie().getTitle()));u.removeMovie(movie);u.getMovies().stream().forEach( m->System.out.println("after movie removal "+m.getMovie().getTitle()));});
 //            //users.stream().map(x -> x.getUser()).forEach(u -> {System.out.println(u.getUsername());u.removeMovie(movie);});
 //        }
 
-        userMovieRepository.deleteByMovie(movie);
+        userMovieRepository.deleteByMovie(movie);   //remove the user-movie associations for this movie
         movieRepository.deleteById(id);
-
-
-
-       //movieRepository.deleteById(id);
-
-       //QUESTION
-       //or:
-//        Movie entity=movieRepository.findById(id);
-//        if (entity==null){
-//
-//            throw new NotFoundException();
-//        }
-//
-//        movieRepository.delete(entity);
 
     }
 
