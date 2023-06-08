@@ -17,7 +17,7 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @NotNull
+    @NotNull                              //TODO: maybe apply some more restrictions on these fields
     private String username;
 
     @NotNull
@@ -34,36 +34,23 @@ public class User {
         this.password = password;
     }
 
-    //we want to retrieve movies like by user
- //!Remark: By putting cascade={CascadeType.PERSIST} to both sides of the relationship, we
-    //are able to save a new user with a new movie entry(the movie is saved too), however we are not able to associate the new user with an existing movie (providing the movie's id field)
-    //By Removing the cascade- persist option from both sides, we are able to associate a new user with an existing movie entry(by providing the movie's id), but unable to save a new user and a new movie object
-//    @ManyToMany()                //creates the junction table
-//    @JoinTable(name="users_movies",joinColumns = @JoinColumn(name="user_id",referencedColumnName = "id"),inverseJoinColumns=@JoinColumn(name="movie_id",referencedColumnName = "id"))
-//    private Set<Movie> movies;
-//
-//    public Set<Movie> getMovies() {
-//        return movies;
-//    }
-//
-//    public void setMovies(Set<Movie> movies) {
-//        this.movies = movies;
-//    }
+
+    //Inspired from: https://vladmihalcea.com/the-best-way-to-map-a-many-to-many-association-with-extra-columns-when-using-jpa-and-hibernate/
 
     @OneToMany(
             mappedBy = "user",
-            cascade = CascadeType.ALL,   //do wee need this?
+            cascade = CascadeType.ALL,   //A short investigation on that
             orphanRemoval = true
     )
     @JsonIgnore
     private List<UserMovie> movies = new ArrayList<>();
 
-    public void addMovie(Movie movie){               //addMovie and removeMovie utility methods are required by every biderectional association
+    public void addMovie(Movie movie){               //addMovie and removeMovie utility methods are required by every biderectional association, to make sure that both sides of the association are in sync.
 
         UserMovie userMovie=new UserMovie(this,movie);     //create a new instance of UserMovie
         movies.add(userMovie);                                  //add the instance to the movies list
         movie.getUsers().add(userMovie);
-        movies.stream().map(m->m.getMovie().getTitle()).forEach(System.out::println);
+        //movies.stream().map(m->m.getMovie().getTitle()).forEach(System.out::println);  debuging purposes
     }
 
     public void removeMovie(Movie movie){
@@ -76,7 +63,7 @@ public class User {
 
                 iterator.remove();     //remove the userMovie instance from the movies list
                 userMovie.getMovie().getUsers().remove(userMovie);  //remove this userMovie instance from the users list of the Movie entity
-                userMovie.setUser(null);   //what about the other properties of the userMovie instance? rate, review, addetAt
+                userMovie.setUser(null);   //todo:what about the other properties of the userMovie instance? rate, review, addetAt
                 userMovie.setMovie(null);
             }
 
@@ -128,17 +115,6 @@ public class User {
 
     }
 
-
-//    public void addMovie(Movie movie){
-//        movies.add(movie);
-//        movie.getUsers().add(this);
-//    }
-//
-//
-//    public void removeMovie(Movie movie){          //the add/remove utility methods are mandatory if you use bidirectional associations so that you can make sure that both sides of the association are in sync.
-//        movies.remove(movie);
-//        movie.getUsers().remove(this);
-//    }
 
     public User(){
 

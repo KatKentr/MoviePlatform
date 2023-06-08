@@ -12,14 +12,14 @@ import java.util.Set;
 
 @Entity
 @Table(name="movies")
-public class Movie  {      //We are not creating getters and setters and we are not providing an @Id: Panache feature
+public class Movie  {      //In case of extending the PanacheEntity: We are not creating getters and setters and we are not providing an @Id: Panache feature
                                                  //By extending PanacheEntity, we’re using the Active Record persistence pattern instead of a DAO. This means that all persistence methods are blended with our own Entity.
   @Id
   @GeneratedValue                  //entity identifier
    private Long id;
 
    @NotNull
-   private String title;                          //Notice that we are setting the instance fields to public with Panache!
+   private String title;                          //Instance fields would be set to public if we extended the panacheEntity
 
    @NotNull
    private String description;
@@ -31,23 +31,8 @@ public class Movie  {      //We are not creating getters and setters and we are 
    private String country;
 
 
-   //we want to get the users who like a movie. Bidirectional Many-to-Many relationship
-//    @ManyToMany(mappedBy = "movies")
-//    //The property mappedBy has the value movies which represents the property movies in the file User.java.
-//    @JsonIgnore
-//    private Set<User> users;
-//
-//
-//    public Set<User> getUsers() { //Do we also need a setter?
-//        return users;
-//    }
-
-    //According to: https://vladmihalcea.com/the-best-way-to-map-a-many-to-many-association-with-extra-columns-when-using-jpa-and-hibernate/
-
     @OneToMany(
             mappedBy = "movie"
-//            cascade = CascadeType.ALL,   //do we need this?
-//            orphanRemoval = true
     )
     private List<UserMovie> users=new ArrayList<>();
 
