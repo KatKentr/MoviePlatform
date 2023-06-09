@@ -4,6 +4,7 @@ package org.acme.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.*;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
@@ -174,7 +175,7 @@ public class UserService {
 
 
 
-    public UserMovieDto addRateToMovie(Long userId, Long movieId,int rate) throws ResourceNotFoundException {
+    public UserMovieDto addRateToMovie(Long userId, Long movieId,@PositiveOrZero(message="number should be a postive integer") @Max(value=10, message="Please rate from 0-10") int rate) throws ResourceNotFoundException {  //TODO: add validation constraint to check that the rate provided represents a number
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?
@@ -187,7 +188,7 @@ public class UserService {
 
     }
 
-    public UserMovieDto addReviewToMovie(Long userId, Long movieId,String review) throws ResourceNotFoundException {
+    public UserMovieDto addReviewToMovie(Long userId, Long movieId, @Size(min = 2,message = "review should be at least two characters") @NotNull String review) throws ResourceNotFoundException {
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?

@@ -142,7 +142,7 @@ public class UserResource {
     @Path("/{userId}/movies/{movieId}/rate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, int rate) throws ResourceNotFoundException {
+    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, @Valid int rate) throws ResourceNotFoundException {
 
         UserMovieDto userMoviedto=userService.addRateToMovie(userId,movieId,rate);
         System.out.println("rate is: "+userMoviedto.getRate());
@@ -156,7 +156,7 @@ public class UserResource {
     @Path("/{userId}/movies/{movieId}/review")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reviewAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, String review) throws ResourceNotFoundException {
+    public Response reviewAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, @Valid String review) throws ResourceNotFoundException {
 
         UserMovieDto userMoviedto=userService.addReviewToMovie(userId,movieId,review);
         //System.out.println("review is: "+userMoviedto.getReview());
