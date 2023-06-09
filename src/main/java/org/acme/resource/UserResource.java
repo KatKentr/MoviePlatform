@@ -17,9 +17,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
+import org.acme.dto.UserMovieDto;
 import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
+import org.acme.model.UserMovie;
 import org.acme.service.UserService;
 import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -139,11 +141,28 @@ public class UserResource {
     @PATCH
     @Path("/{userId}/movies/{movieId}/rate")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, int rate) throws ResourceNotFoundException {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, @Valid int rate) throws ResourceNotFoundException {
 
-        userService.addRateToMovie(userId,movieId,rate);
+        UserMovieDto userMoviedto=userService.addRateToMovie(userId,movieId,rate);
+        System.out.println("rate is: "+userMoviedto.getRate());
 
-        return Response.ok().build();
+        return Response.status(Response.Status.OK).entity(userMoviedto).build();
+
+    }
+
+    @Transactional
+    @PATCH
+    @Path("/{userId}/movies/{movieId}/review")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reviewAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, @Valid String review) throws ResourceNotFoundException {
+
+        UserMovieDto userMoviedto=userService.addReviewToMovie(userId,movieId,review);
+        //System.out.println("review is: "+userMoviedto.getReview());
+
+        return Response.status(Response.Status.OK).entity(userMoviedto).build();
+
     }
 
 

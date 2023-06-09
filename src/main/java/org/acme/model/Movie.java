@@ -34,6 +34,7 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
     @OneToMany(
             mappedBy = "movie"
     )
+    @JsonIgnore
     private List<UserMovie> users=new ArrayList<>();
 
 
