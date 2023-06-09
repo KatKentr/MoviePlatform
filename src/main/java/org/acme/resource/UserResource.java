@@ -151,6 +151,20 @@ public class UserResource {
 
     }
 
+    @Transactional
+    @PATCH
+    @Path("/{userId}/movies/{movieId}/review")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reviewAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, String review) throws ResourceNotFoundException {
+
+        UserMovieDto userMoviedto=userService.addReviewToMovie(userId,movieId,review);
+        //System.out.println("review is: "+userMoviedto.getReview());
+
+        return Response.status(Response.Status.OK).entity(userMoviedto).build();
+
+    }
+
 
 
 

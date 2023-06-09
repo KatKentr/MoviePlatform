@@ -187,6 +187,21 @@ public class UserService {
 
     }
 
+    public UserMovieDto addReviewToMovie(Long userId, Long movieId,String review) throws ResourceNotFoundException {
+        Optional<User> optional=userRepository.findByIdOptional(userId); //find user
+        User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
+        //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?
+        Optional<UserMovie> optUserMovie=user.getMovies().stream().filter( x -> x.getMovie().getId()==movieId).findFirst();
+        UserMovie userMovie=optUserMovie.orElseThrow(() -> new ResourceNotFoundException("User has not added movie with id: "+movieId+" in their collection"));
+        userMovie.setReview(review);
+        //Hibernate.initialize(userMovie.getUser());
+        Hibernate.initialize(userMovie.getMovie());
+        return userMovieMapper.toDto(userMovie,user);
+
+    }
+
+
+
     //Deleting a user, automatically deletes their relationship in the users_movies table as well as the users_follows table
 
     public void deleteUserById(Long userId) throws ResourceNotFoundException {
