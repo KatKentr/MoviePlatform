@@ -3,13 +3,16 @@ package org.acme.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
+import org.acme.dto.UserMovieDto;
 import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.mapper.MovieMapper;
 import org.acme.mapper.UserMapper;
+import org.acme.mapper.UserMovieMapper;
 import org.acme.model.Movie;
 import org.acme.model.User;
 import org.acme.model.UserMovie;
@@ -17,6 +20,7 @@ import org.acme.repository.MovieRepository;
 import org.acme.repository.UserMovieRepository;
 import org.acme.repository.UserRepository;
 import org.acme.service.MovieService;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +39,10 @@ public class UserService {
 
    @Inject
     MovieMapper movieMapper;
+
+
+   @Inject
+    UserMovieMapper userMovieMapper;
 
 
     public UserService(UserRepository userRepository, MovieRepository movieRepository){         //constructor-based injection
@@ -163,13 +171,20 @@ public class UserService {
 
     //TODO: add review and rate to a movie
 
-    public void addRateToMovie(Long userId, Long movieId,int rate) throws ResourceNotFoundException {
+
+
+
+    public UserMovieDto addRateToMovie(Long userId, Long movieId,int rate) throws ResourceNotFoundException {
         Optional<User> optional=userRepository.findByIdOptional(userId); //find user
         User user=optional.orElseThrow(() -> new ResourceNotFoundException("User with id: "+userId+"does not exist"));
         //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?
         Optional<UserMovie> optUserMovie=user.getMovies().stream().filter( x -> x.getMovie().getId()==movieId).findFirst();
         UserMovie userMovie=optUserMovie.orElseThrow(() -> new ResourceNotFoundException("User has not added movie with id: "+movieId+" in their collection"));
         userMovie.setRate(rate);
+        //Hibernate.initialize(userMovie.getUser());
+        Hibernate.initialize(userMovie.getMovie());
+        return userMovieMapper.toDto(userMovie);
+        //return userMovie;
         //TODO: how we could display the movie with this information?
 
     }
