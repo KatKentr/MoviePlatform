@@ -10,10 +10,14 @@ import java.util.Date;
 
 public class UserMovieDto {
 
-    private UserMovie.UserMovieId primaryKey;
+    //private UserMovie.UserMovieId primaryKey;    we dont want to expose composite key and all user fields
 
 
     //private User user;
+
+    //user details
+    private String username;
+    private String email;
 
 
     private Movie movie;
@@ -29,30 +33,15 @@ public class UserMovieDto {
 
     }
 
-   public UserMovieDto(UserMovie.UserMovieId primaryKey, Movie movie, int rate, String review, Date addedAt) {
-        this.primaryKey = primaryKey;
-        //this.user = user;
+   public UserMovieDto(Movie movie, int rate, String review, Date addedAt, String username, String email) {
         this.movie = movie;
         this.rate = rate;
         this.review = review;
         this.addedAt = addedAt;
+        this.username=username;
+        this.email=email;
     }
 
-    public UserMovie.UserMovieId getPrimaryKey() {
-        return primaryKey;
-    }
-
-    public void setPrimaryKey(UserMovie.UserMovieId primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-//    public User getUser() {
-//        return user;
-//    }
-//
-//    public void setUser(User user) {
-//        this.user = user;
-//    }
 
     public Movie getMovie() {
         return movie;
@@ -84,5 +73,21 @@ public class UserMovieDto {
 
     public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

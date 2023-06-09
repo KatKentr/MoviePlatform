@@ -183,9 +183,7 @@ public class UserService {
         userMovie.setRate(rate);
         //Hibernate.initialize(userMovie.getUser());
         Hibernate.initialize(userMovie.getMovie());
-        return userMovieMapper.toDto(userMovie);
-        //return userMovie;
-        //TODO: how we could display the movie with this information?
+        return userMovieMapper.toDto(userMovie,user);
 
     }
 

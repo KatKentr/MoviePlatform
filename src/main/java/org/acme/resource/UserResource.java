@@ -142,13 +142,13 @@ public class UserResource {
     @Path("/{userId}/movies/{movieId}/rate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserMovieDto rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, int rate) throws ResourceNotFoundException {
+    public Response rateAMovie(@PathParam("userId") Long userId,@PathParam("movieId") Long movieId, int rate) throws ResourceNotFoundException {
 
         UserMovieDto userMoviedto=userService.addRateToMovie(userId,movieId,rate);
         System.out.println("rate is: "+userMoviedto.getRate());
 
-        //return Response.status(Response.Status.CREATED).entity(userMovie).build();
-        return userMoviedto;
+        return Response.status(Response.Status.OK).entity(userMoviedto).build();
+
     }
 
 
