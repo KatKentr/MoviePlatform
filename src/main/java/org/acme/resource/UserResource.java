@@ -8,6 +8,7 @@ import io.quarkus.resteasy.reactive.links.InjectRestLinks;
 import io.quarkus.resteasy.reactive.links.RestLink;
 import io.quarkus.resteasy.reactive.links.RestLinkType;
 import io.quarkus.resteasy.reactive.links.RestLinksProvider;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Path("/users")
+@RolesAllowed({"USER", "ADMIN"})
 public class UserResource {
 
     @Inject
