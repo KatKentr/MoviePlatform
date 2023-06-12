@@ -53,31 +53,6 @@ public class UserService {
 
     }
 
-    public UserDto saveNewUser(UserDto userDto) throws DuplicateResourceException {
-
-        if (userRepository.existsbyEmail(userDto.getEmail())){
-
-            throw new DuplicateResourceException("User with email "+userDto.getEmail()+" already exists");
-        }
-
-        if (userRepository.existsbyUsername(userDto.getUsername())){
-
-            throw new DuplicateResourceException("Username "+userDto.getUsername()+" is already taken");
-        }
-
-        User user=userMapper.toEntity(userDto);
-        userRepository.persist(user);
-
-        if (userRepository.isPersistent(user)){
-
-            return userMapper.toDTO(user);
-
-        } else {
-
-            throw new NotFoundException();         //TODO: should we check that the object is persisted at this point? or scope of unit test? what a exception should be thrown in this case? i.e when an object is not saved in the db
-        }
-    }
-
 
     public List<UserDto> retrieveAllUsers(){
 
@@ -169,9 +144,6 @@ public class UserService {
         return movieDtos;
 
     }
-
-    //TODO: add review and rate to a movie
-
 
 
 

@@ -2,6 +2,11 @@ package org.acme.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.quarkus.elytron.security.common.BcryptUtil;
+import io.quarkus.security.jpa.Password;
+import io.quarkus.security.jpa.Roles;
+import io.quarkus.security.jpa.UserDefinition;
+import io.quarkus.security.jpa.Username;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,27 +16,37 @@ import java.util.*;
 //A user can select their favorite movies
 @Entity
 @Table(name="users")
+@UserDefinition
 public class User {
 
     @Id
     @GeneratedValue
     private Long id;
 
+    @Username
     @NotNull                              //TODO: maybe apply some more restrictions on these fields
     private String username;
 
     @NotNull
     private String email;
 
+    @Password
     @NotNull
     private String password;
+
+
+    @Roles
+    @NotNull
+    public String role;
+
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) {          //we don't want to store plain raw passwords in the db, so we call the hash function in the setPassowrd method
+
+        this.password = BcryptUtil.bcryptHash(password);
     }
 
 
@@ -157,5 +172,14 @@ public class User {
 
     public void setMovies(List<UserMovie> movies) {
         this.movies = movies;
+    }
+
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

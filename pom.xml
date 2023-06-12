@@ -104,6 +104,10 @@
     <version>1.5.3.Final</version>
     <scope>provided</scope>
   </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-security-jpa</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
