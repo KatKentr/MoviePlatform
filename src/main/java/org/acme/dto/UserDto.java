@@ -3,6 +3,7 @@ package org.acme.dto;
 import jakarta.validation.constraints.NotNull;
 import org.acme.model.Movie;
 
+import java.util.List;
 import java.util.Set;
 
 public class UserDto {
@@ -17,18 +18,22 @@ public class UserDto {
     @NotNull
     private String email;
 
+
     @NotNull
-    private String password;
+    private String role;
 
-    public String getPassword() {
-        return password;
-    }
+//    @NotNull
+//    private String password;
+//
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    public void setPassword(String password) {
+//        this.password = password;
+//    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    private Set<Movie> movies;
+//    private List<Movie> movies;   //TODO: Do we really need to load the movies of each user? We could remove this
 
     public Long getId() {
         return id;
@@ -54,11 +59,20 @@ public class UserDto {
         this.email = email;
     }
 
-    public Set<Movie> getMovies() {
-        return movies;
+//    public List<Movie> getMovies() {
+//        return movies;
+//    }
+//
+//    public void setMovies(List<Movie> movies) {
+//        this.movies = movies;
+//    }
+
+
+    public String getRole() {
+        return role;
     }
 
-    public void setMovies(Set<Movie> movies) {
-        this.movies = movies;
+    public void setRole(String role) {
+        this.role = role;
     }
 }
