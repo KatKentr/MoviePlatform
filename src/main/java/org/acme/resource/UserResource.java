@@ -186,9 +186,9 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveFollowers(@PathParam("userId") Long userId) throws ResourceNotFoundException { //retrieve people that these user follows
 
-        Set<User> users=userService.getFollowersOfUser(userId);
+        Set<UserDto> userDtos=userService.getFollowersOfUser(userId);
 
-        return Response.status(Response.Status.OK).entity(users).build();
+        return Response.status(Response.Status.OK).entity(userDtos).build();
     }
 
     @GET
@@ -197,9 +197,9 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response retrieveFollows(@PathParam("userId") Long userId) throws ResourceNotFoundException { //retrieve people that these user follows
 
-        Set<User> users=userService.getFollowingUsers(userId);
+        Set<UserDto> userDtos=userService.getFollowingUsers(userId);
 
-        return Response.status(Response.Status.OK).entity(users).build();
+        return Response.status(Response.Status.OK).entity(userDtos).build();
     }
 
 

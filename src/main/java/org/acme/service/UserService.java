@@ -93,21 +93,21 @@ public class UserService {
 
     //TO CHECK: Does Hibernate executes the sql queries in the backroound?
 
-    public Set<User> getFollowersOfUser(Long userId) throws ResourceNotFoundException {         //TODO: return dto data type
+    public Set<UserDto> getFollowersOfUser(Long userId) throws ResourceNotFoundException {
 
         Optional<User> userOptional=userRepository.findByIdOptional(userId);
         User user=userOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userId+" not found"));
 
-        return user.getFollowers();
+        return user.getFollowers().stream().map( u-> userMapper.toDTO(u)).collect(Collectors.toSet());
 
     }
 
-    public Set<User> getFollowingUsers(Long userId) throws ResourceNotFoundException {   //retrieve the users that the user follows
+    public Set<UserDto> getFollowingUsers(Long userId) throws ResourceNotFoundException {   //retrieve the users that the user follows
 
         Optional<User> userOptional=userRepository.findByIdOptional(userId);
         User user=userOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userId+" not found"));
 
-        return user.getFollowing();
+        return user.getFollowing().stream().map(u->userMapper.toDTO(u)).collect(Collectors.toSet());
 
     }
 
