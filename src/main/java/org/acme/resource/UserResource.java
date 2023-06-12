@@ -17,12 +17,14 @@ import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.dto.MovieDto;
+import org.acme.dto.SignupDto;
 import org.acme.dto.UserDto;
 import org.acme.dto.UserMovieDto;
 import org.acme.exceptions.DuplicateResourceException;
 import org.acme.exceptions.ResourceNotFoundException;
 import org.acme.model.User;
 import org.acme.model.UserMovie;
+import org.acme.service.AuthService;
 import org.acme.service.UserService;
 import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -38,6 +40,9 @@ public class UserResource {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private AuthService authService;
 
 
 
@@ -69,6 +74,7 @@ public class UserResource {
 
     @Transactional
     @DELETE                                        //delete user by id
+    @RolesAllowed({"ADMIN"})    //only admins are allowed to delete users
     @Path("/{id}")
     public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {    //returns a a movie dto
 
@@ -77,26 +83,6 @@ public class UserResource {
 
 
     }
-
-    @Transactional
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({MediaType.APPLICATION_JSON,RestMediaType.APPLICATION_HAL_JSON})
-    @InjectRestLinks(RestLinkType.INSTANCE)   //injecting the URI for the created resource and the link to retrieve all-users into the response HTTP headers
-    public Response newUser(UserDto userDto) throws DuplicateResourceException {        //returns a userDto
-
-        UserDto newUserDto = userService.saveNewUser(userDto);
-//          movieService.saveNewMovie();
-//          if (movieService.existsInDb(movie)){
-//              return Response.status(Status.CREATED).entity(movie).build();     //returns status 201 and the movie as json response
-//          }
-//          return Response.status(NOT_FOUND).build();
-
-        return Response.status(Response.Status.CREATED).entity(newUserDto).build();
-
-
-    }
-
 
     @Transactional
     @POST
