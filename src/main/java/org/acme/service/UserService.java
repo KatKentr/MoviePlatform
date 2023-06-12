@@ -71,12 +71,12 @@ public class UserService {
 
     }
 
-    public void follow(Long userId, User userToFollow) throws ResourceNotFoundException {   //TODO: replace method's argument with Dto data type
+    public void follow(Long userId, String usernameToFollow) throws ResourceNotFoundException {
 
         Optional<User> userOptional=userRepository.findByIdOptional(userId);
         User user=userOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userId+" not found"));
-        Optional<User> toFollowOptional=userRepository.findByIdOptional(userToFollow.getId());  //else throw userNotFoundException
-        User toFollow=toFollowOptional.orElseThrow(() -> new ResourceNotFoundException("user with id: "+userToFollow.getId()+" not found"));
+        Optional<User> toFollowOptional=userRepository.findByUsername(usernameToFollow);  //else throw userNotFoundException
+        User toFollow=toFollowOptional.orElseThrow(() -> new ResourceNotFoundException("user with username: "+usernameToFollow+" not found"));
         user.addFollowing(toFollow);
 
     }

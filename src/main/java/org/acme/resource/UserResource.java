@@ -87,11 +87,11 @@ public class UserResource {
     @Transactional
     @POST
     @Path("/{userId}/follows")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newUserToFollow(@PathParam("userId") Long userId,User userToFollow) throws ResourceNotFoundException {
+    public Response newUserToFollow(@PathParam("userId") Long userId,String usernameToFollow) throws ResourceNotFoundException {
 
-        userService.follow(userId,userToFollow);
+        userService.follow(userId,usernameToFollow);
 
         return Response.status(Response.Status.CREATED).build();
     }
