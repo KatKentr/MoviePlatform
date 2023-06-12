@@ -33,7 +33,7 @@ public class UserDto {
 //        this.password = password;
 //    }
 
-    private List<Movie> movies;   //TODO: Do we really need to load the movies of each user? We could remove this
+//    private List<Movie> movies;   //TODO: Do we really need to load the movies of each user? We could remove this
 
     public Long getId() {
         return id;
@@ -59,13 +59,13 @@ public class UserDto {
         this.email = email;
     }
 
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    public void setMovies(List<Movie> movies) {
-        this.movies = movies;
-    }
+//    public List<Movie> getMovies() {
+//        return movies;
+//    }
+//
+//    public void setMovies(List<Movie> movies) {
+//        this.movies = movies;
+//    }
 
 
     public String getRole() {
