@@ -4,6 +4,7 @@ package org.acme.resource;
 import io.quarkus.resteasy.reactive.links.InjectRestLinks;
 import io.quarkus.resteasy.reactive.links.RestLink;
 import io.quarkus.resteasy.reactive.links.RestLinkType;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
 
 
 @Path("/movies")
+@RolesAllowed({"USER", "ADMIN"})
 public class MovieResource {
 
     @Inject
@@ -58,6 +60,7 @@ public class MovieResource {
    //create a new movie
     @Transactional
     @POST
+    @RolesAllowed("ADMIN")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newMovie(@Valid MovieDto movieDto) throws DuplicateResourceException {        //returns a movieDto
@@ -115,6 +118,7 @@ public class MovieResource {
     @Transactional
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     //@Produces(MediaType.APPLICATION_JSON)
     public Response deleteById(@PathParam("id") Long id) throws ResourceNotFoundException {
 
