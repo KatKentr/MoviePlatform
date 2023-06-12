@@ -1,9 +1,25 @@
 
-A movie streaming platfform. Users can add their movies that are available in the platfrom.
+# MoviePlatform API :clapper:
 
-Start the application in dev mode: mvn quarkus:dev
+A REST API for a movie streaming platform built with Quarkus. Connection to PostgreSQL database. Users can select movies, which are available in the platform. Users can register, follow other users, add and manage movies in their collections as well as rate and leave a review for a movie. 
 
 
+## Run in dev mode:
+
+ mvn quarkus:dev
+
+
+## Technologies used:
+
+- Java
+- Quarkus
+- JPA/Hibernate
+- PostgreSQL
+- Mapstruct
+- JUnit
+
+
+<!--
 # getting-started
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
@@ -64,3 +80,4 @@ If you want to learn more about building native executables, please consult http
 Easily start your Reactive RESTful Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+-->
