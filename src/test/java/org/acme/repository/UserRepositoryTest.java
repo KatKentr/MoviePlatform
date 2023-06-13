@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -54,7 +55,7 @@ public class UserRepositoryTest {
 
   @Test
   @TestTransaction
-  public void listAll_shouldBeAbleToRetrieveAllUsersInAList(){
+  public void listAll_shouldBeAbleToReturnAllUsersInAList(){
 
       User validUser2 =new User();                      //initialize a second valid user
       validUser2.setUsername("Testperson2");
@@ -72,6 +73,89 @@ public class UserRepositoryTest {
 
 
   }
+    @Test
+    @TestTransaction
+    public void findUserbyIdTest_exists() {
+
+       userRepository.persist(validUser);
+       System.out.println("validUser has id: "+validUser.getId());
+       Optional<User> opt=userRepository.findByIdOptional(validUser.getId());
+       Assertions.assertTrue(opt.isPresent());
+       assertEquals(opt.get().getId(),validUser.getId());
+       assertEquals(opt.get().getUsername(),validUser.getUsername());
+
+    }
+
+    //findbyUsername exists
+    @Test
+    @TestTransaction
+    public void findbyUsername_exists() {
+
+        userRepository.persist(validUser);
+        Optional<User> opt=userRepository.findByUsername(validUser.getUsername());
+        Assertions.assertTrue(opt.isPresent());
+        assertEquals(opt.get().getId(),validUser.getId());
+        assertEquals(opt.get().getUsername(),validUser.getUsername());
+
+    }
+
+
+    @Test
+    @TestTransaction
+    public void findbyUsername_notExists() {
+
+        Optional<User> opt=userRepository.findByUsername(validUser.getUsername());
+        Assertions.assertTrue(opt.isEmpty());
+
+    }
+
+    //existsby Username and exists by Email
+
+    @Test
+    @TestTransaction
+    public void existsByUsername_exists() {
+
+        userRepository.persist(validUser);
+        Boolean bool=userRepository.existsbyUsername(validUser.getUsername());
+        Assertions.assertTrue(bool);
+
+    }
+
+    @Test
+    @TestTransaction
+    public void existsByUsername_notExists() {
+
+        Boolean bool=userRepository.existsbyUsername(validUser.getUsername());
+        assertEquals(bool,false);
+
+    }
+
+
+    @Test
+    @TestTransaction
+    public void existsByEmail_exists() {
+
+        userRepository.persist(validUser);
+        Boolean bool=userRepository.existsbyEmail(validUser.getEmail());
+        Assertions.assertTrue(bool);
+
+    }
+
+    @Test
+    @TestTransaction
+    public void existsByEmail_notExists() {
+
+        Boolean bool=userRepository.existsbyEmail(validUser.getEmail());
+        assertEquals(bool,false);
+
+    }
+
+
+
+
+
+
+
 
 
 
