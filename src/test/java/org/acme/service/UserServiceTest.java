@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,6 +64,34 @@ public class UserServiceTest {
             userService.retrieveUserById(validUser.getId());
         });
         Assertions.assertTrue(exception.getMessage().contains("user with id: "+validUser.getId()+ " not found"));
+    }
+
+
+    @Test
+    public void retrieveAllUsersShouldReturnAllUsers(){
+
+        validAdmin=testUtils.createValidUserwithRoleAdmin();
+        when(userRepository.listAll()).thenReturn(List.of(validAdmin,validUser));
+        List<UserDto> userDtos=userService.retrieveAllUsers();  //the method returns dtos
+        assertEquals(2,userDtos.size());
+
+
+    }
+
+
+    //tests for method follow, 3 test cases, 1 valid and 1 to test the exception thrown
+
+    //TODO: how do we test void methods? Argument Captor and verify
+    @Test
+    public void followAUser_UserNotFound(){
+
+        String usernameToFollow="Foufoutos";
+        when(userRepository.findByIdOptional(validUser.getId())).thenReturn(Optional.ofNullable(validUser));
+        when(userRepository.findByUsername(usernameToFollow)).thenReturn(Optional.empty());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            userService.follow(validUser.getId(),usernameToFollow);
+        });
+        Assertions.assertTrue(exception.getMessage().contains("user with username: "+usernameToFollow+" not found"));
     }
 
 
