@@ -1,5 +1,6 @@
 package org.acme.service;
 
+import io.quarkus.test.Mock;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -31,6 +32,7 @@ public class UserServiceTest {
 
     @InjectMock
     UserRepository userRepository;
+
 
 
     private User user, validAdmin;
@@ -111,22 +113,29 @@ public class UserServiceTest {
 
     // Testing of a void method: with verify (check also ArgumentCaptor)
     @Test
-    public void followAUser_succesfull() throws ResourceNotFoundException {
+    public void followAUser_succesfull() throws ResourceNotFoundException {               //OPEN QUESTION: the method follow(Long id, String name) of the Service class that we want to test, is a void method. Therefore, we could use verify() to check the invocation of the void method user.addFollowing(), which is invoked inside the method follow: approach A. However, we don't check with this approach if the followings set includes the user added. Another approach would be not to work with a mock user, instead we invoke the follow method and check the size of the list by getFollowings(): Approach B
 
-        User user = mock(User.class);
-        user.setUsername("Testperson");
-        user.setEmail("test@example.com");
-        user.setPassword("1234");
-        user.setRole("USER");
-        user.setId(1L);
+        //APPROACH A
 
+//        User userMock=testUtils.createValidUserMockwithRoleUser();
+//        validAdmin=testUtils.createValidUserwithRoleAdmin();
+//        String usernameToFollow=validAdmin.getUsername();
+//        when(userRepository.findByIdOptional(userMock.getId())).thenReturn(Optional.ofNullable(userMock));
+//        when(userRepository.findByUsername(usernameToFollow)).thenReturn(Optional.ofNullable(validAdmin));
+//        userService.follow(userMock.getId(),usernameToFollow);
+//        verify(userMock,times(1)).addFollowing(validAdmin);         //we check that the method is invoked once
+////        assertEquals(1,userMock.getFollowing().size());    does not work  //TO INVESTIGATE: How do we check then that the user is added in the addFollowing List?
 
-        validAdmin=testUtils.createValidUserwithRoleAdmin();
-        String usernameToFollow=validAdmin.getUsername();
+        //APPROACH B
+
+        User userToFollow=testUtils.createValidUserwithRoleAdmin();
+        String usernameToFollow=userToFollow.getUsername();
         when(userRepository.findByIdOptional(user.getId())).thenReturn(Optional.ofNullable(user));
-        when(userRepository.findByUsername(usernameToFollow)).thenReturn(Optional.ofNullable(validAdmin));
+        when(userRepository.findByUsername(usernameToFollow)).thenReturn(Optional.ofNullable(userToFollow));
         userService.follow(user.getId(),usernameToFollow);
-        verify(user,times(1)).addFollowing(validAdmin);         //we check that the method is invoked once
+        assertEquals(1,user.getFollowing().size());     //We check the size of the followings set
+        assertTrue(user.getFollowing().contains(userToFollow));
+        //user.getFollowing().stream().forEach( x -> System.out.println(x.getUsername()));
 
     }
 
@@ -140,23 +149,22 @@ public class UserServiceTest {
     public void getFollowersOfUserShouldReturnFollowers() throws ResourceNotFoundException {
 
 
-        User user = mock(User.class);
-        user.setUsername("Testperson");
-        user.setEmail("test@example.com");
-        user.setPassword("1234");
-        user.setRole("USER");
-        user.setId(1L);
+        User userMock=testUtils.createValidUserMockwithRoleUser();
 
-        when(userRepository.findByIdOptional(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findByIdOptional(userMock.getId())).thenReturn(Optional.ofNullable(userMock));
         User follower=testUtils.createValidUserwithRoleAdmin();
-        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.ofNullable(user));
+//        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.ofNullable(user));
         //userService.follow(follower.getId(),user.getUsername());         //follower follows user  //TO INVESTIGATE: It seems that we are invoking (testing?) two methods of the useService, not sure if ti is the correct approach.
-        when(user.getFollowers()).thenReturn(Set.of(follower));
-        Set<UserDto> userDtos=userService.getFollowersOfUser(user.getId());
-        assertTrue(!userDtos.isEmpty());
+        when(userMock.getFollowers()).thenReturn(Set.of(follower));
+        Set<UserDto> userDtos=userService.getFollowersOfUser(userMock.getId());  //the method we want to test
         assertEquals(1,userDtos.size());
+       // assertTrue(userDtos.contains(follower));  Note: does not work because we have not overriden equals in UserDto
+        //userDtos.stream().forEach( x -> System.out.println(x.getUsername()));
 
     }
+
+
+    //++ test other methods
 
 
 
