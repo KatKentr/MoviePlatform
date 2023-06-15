@@ -10,9 +10,13 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.TestUtils;
+import org.acme.TestUtilsMovie;
+import org.acme.dto.MovieDto;
 import org.acme.dto.UserDto;
 import org.acme.exceptions.ResourceNotFoundException;
+import org.acme.mapper.MovieMapper;
 import org.acme.mapper.UserMapper;
+import org.acme.model.Movie;
 import org.acme.model.User;
 import org.acme.service.UserService;
 import org.jboss.resteasy.reactive.common.util.RestMediaType;
@@ -40,10 +44,17 @@ public class UserResourceTest {
     UserMapper userMapper;
 
 
+    @Inject
+    MovieMapper movieMapper;
+
+
     private User user, userAdmin;
 
 
+
     private TestUtils testUtils=new TestUtils();
+
+    private TestUtilsMovie testUtilsMovie=new TestUtilsMovie();
 
 
     @BeforeEach
@@ -141,6 +152,27 @@ public class UserResourceTest {
                 .body("_links.all-users.href",equalTo("http://localhost:8081/users"))  //check presence of hyperlinks in json response
                 .body("_links.self.href",equalTo("http://localhost:8081/users"+ "/" +userDto.getId()));
 
+
+    }
+
+
+    @Test
+    @TestSecurity(user = "testUser", roles = {"ADMIN","USER"})
+    public void getMoviesOfUserShouldReturnMovies() throws ResourceNotFoundException {
+
+        Movie movie1=testUtilsMovie.createValidMovie("title","director","desc","Country",1L);
+        Movie movie2=testUtilsMovie.createValidMovie("title2","director","desc","Country",2L);
+
+        List<MovieDto> movies=List.of(movieMapper.toDto(movie1),movieMapper.toDto(movie2));
+
+        when(userService.getMoviesOfUser(user.getId())).thenReturn(movies);
+
+        given()
+                .when().get("/"+user.getId()+"/movies")
+                .then()
+                .log().body()   //print response
+                .body("size()",equalTo(movies.size()))
+                 .body("title",hasItems(movies.get(0).getTitle(),movies.get(1).getTitle()));
 
     }
 
