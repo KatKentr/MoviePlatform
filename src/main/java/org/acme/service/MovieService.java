@@ -1,8 +1,10 @@
 package org.acme.service;
 
 
+import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.NotFoundException;
 import org.acme.dto.MovieDto;
 import org.acme.exceptions.DuplicateResourceException;
@@ -39,9 +41,9 @@ public class MovieService {
         this.movieRepository=movieRepository;
     }
 
-    public List<MovieDto> retrieveAllMovies(){     //return a list of MovieDtos
+    public List<MovieDto> retrieveAllMovies(@PositiveOrZero(message="pageNo should be a postive integer") int pageNo, @PositiveOrZero(message="pageSize should be a positive integer") int pageSize){     //return a list of MovieDtos, pageSize corresponds to ItemsPerPage //OPEN QUESTION: constraint to maximum number of pages?
 
-        List<Movie> movies=movieRepository.listAll();
+        List<Movie> movies=movieRepository.findAll().page(Page.of(pageNo,pageSize)).list();
         List<MovieDto> moviesDto=movies.stream().map(m-> movieMapper.toDto(m)).collect(Collectors.toList());
         return moviesDto;
 

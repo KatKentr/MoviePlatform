@@ -46,12 +46,12 @@ public class MovieResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RestLink(rel = "all-movies")           //declare the web link to retrieve all movies
     @InjectRestLinks
-    public List<MovieDto> movies(@QueryParam("director") String director){
+    public List<MovieDto> movies(@QueryParam("director") String director, @DefaultValue("0") @QueryParam(value= "pageNo") @Valid int pageNo, @DefaultValue("10") @QueryParam(value= "pageSize") @Valid int pageSize){
         if (director!=null){
             return movieService.retrieveMoviesByDirector(director);
         }
 
-        return movieService.retrieveAllMovies();            //listAll() method comes from Panache
+        return movieService.retrieveAllMovies(pageNo,pageSize);            //listAll() method comes from Panache
         //List<Movie> movies=Movie.listAll();
         //return Response.ok(movies).build();   //In this case, the return type of the method would be Response instead of List<Movie)
     }
