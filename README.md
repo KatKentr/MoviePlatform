@@ -1,7 +1,7 @@
 
 # MoviePlatform API :clapper:
 
-A REST API for a movie streaming platform built with Quarkus. Connection to PostgreSQL database. Users can select movies, which are available in the platform. Users can register, follow other users, add and manage movies in their collections as well as rate and leave a review for a movie. 
+A REST API for a simple movie streaming platform built with Quarkus. Connection to PostgreSQL database.  Users can register, authenticated users can follow other users, add and manage movies in their collections as well as rate and leave a review for a movie. 
 
 
 ## Run in dev mode:
@@ -16,7 +16,10 @@ A REST API for a movie streaming platform built with Quarkus. Connection to Post
 - JPA/Hibernate
 - PostgreSQL
 - Mapstruct
+- H2 database used for testing
 - JUnit
+- Mockito
+- Rest-assured
 
 
 <!--
