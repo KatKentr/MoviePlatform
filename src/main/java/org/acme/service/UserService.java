@@ -153,9 +153,23 @@ public class UserService {
         //should we check that the mvovie exists in the db? Or directly if a movie with this id is related to a user?
         Optional<UserMovie> optUserMovie=user.getMovies().stream().filter( x -> x.getMovie().getId()==movieId).findFirst();
         UserMovie userMovie=optUserMovie.orElseThrow(() -> new ResourceNotFoundException("User has not added movie with id: "+movieId+" in their collection"));
+        int currRate= userMovie.getRate();
         userMovie.setRate(rate);
         //Hibernate.initialize(userMovie.getUser());
         Hibernate.initialize(userMovie.getMovie());
+        if (currRate==0  && rate>0){    //if the user has not rated the movie before
+            userMovie.getMovie().incrementRateCount();
+            userMovie.getMovie().addToRatesSum(rate);
+        } else if (currRate>0 && rate>0) {   //if the user has rated the movie before
+            userMovie.getMovie().removeRateFromSum(currRate);
+            userMovie.getMovie().addToRatesSum(rate);
+        }else if (currRate>0  && rate==0){   //user removes their rate, by setting the rate back to 0.0
+            userMovie.getMovie().decrementRateCount();
+            userMovie.getMovie().removeRateFromSum(currRate);
+
+        }
+
+        System.out.println(userMovie.getMovie().getAverage());
         return userMovieMapper.toDto(userMovie,user);
 
     }

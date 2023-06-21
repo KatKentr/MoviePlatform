@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 
 
 @Entity
@@ -29,6 +27,13 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
 
    @NotNull
    private String country;
+
+
+   @Column(name="rates_number")
+   private int ratesCount;
+
+   @Column(name="rates_sum")
+   private int sum;
 
 
     @OneToMany(
@@ -94,4 +99,62 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
     public void setUsers(List<UserMovie> users) {
         this.users = users;
     }
+
+    public int getRatesCount() {
+        return ratesCount;
+    }
+
+    public void setRatesCount(int ratesCount) {
+        this.ratesCount = ratesCount;
+    }
+
+    public int getSum() {
+        return sum;
+    }
+
+    public void setSum(int sum) {
+        this.sum = sum;
+    }
+
+    public double getAverage(){   //calculate average rating of movie
+
+       if (ratesCount!=0) {
+
+           return  sum/ratesCount;
+       } else {
+
+           return 0.0;
+
+       }
+    }
+
+    public void incrementRateCount(){
+
+        setRatesCount(getRatesCount()+1);
+    }
+
+    public void decrementRateCount(){
+
+        if (getRatesCount()>0){
+            setRatesCount(getRatesCount()-1);
+        }
+
+    }
+
+    public void addToRatesSum(int rate){
+
+        setSum(getSum()+rate);
+
+    }
+
+    public void removeRateFromSum(int rate){
+
+        if (getSum()>=rate){
+            setSum(getSum()-rate);
+        }
+
+    }
+
+
+
 }
