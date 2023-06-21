@@ -133,9 +133,25 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
         setRatesCount(getRatesCount()+1);
     }
 
+    public void decrementRateCount(){
+
+        if (getRatesCount()>0){
+            setRatesCount(getRatesCount()-1);
+        }
+
+    }
+
     public void addToRatesSum(int rate){
 
         setSum(getSum()+rate);
+
+    }
+
+    public void removeRateFromSum(int rate){
+
+        if (getSum()>=rate){
+            setSum(getSum()-rate);
+        }
 
     }
 
