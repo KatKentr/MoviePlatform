@@ -35,6 +35,9 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
    @Column(name="rates_sum")
    private int sum;
 
+   @Transient              //not mapped to db
+   private double average;
+
 
     @OneToMany(
             mappedBy = "movie"
@@ -120,12 +123,14 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
 
        if (ratesCount!=0) {
 
-           return  sum/ratesCount;
+             average=sum/ratesCount;
        } else {
 
-           return 0.0;
+           average=0.0;
 
        }
+
+       return average;
     }
 
     public synchronized void incrementRateCount(){
