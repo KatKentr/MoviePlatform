@@ -128,12 +128,12 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
        }
     }
 
-    public void incrementRateCount(){
+    public synchronized void incrementRateCount(){
 
         setRatesCount(getRatesCount()+1);
     }
 
-    public void decrementRateCount(){
+    public synchronized void decrementRateCount(){
 
         if (getRatesCount()>0){
             setRatesCount(getRatesCount()-1);
@@ -141,13 +141,13 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
 
     }
 
-    public void addToRatesSum(int rate){
+    public synchronized void addToRatesSum(int rate){
 
         setSum(getSum()+rate);
 
     }
 
-    public void removeRateFromSum(int rate){
+    public synchronized void removeRateFromSum(int rate){
 
         if (getSum()>=rate){
             setSum(getSum()-rate);
