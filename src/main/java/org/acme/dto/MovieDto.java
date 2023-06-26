@@ -21,7 +21,7 @@ public class MovieDto {
     @NotNull
     private String country;
 
-    private double average;
+    private double rating;
 
     public MovieDto(){
 
@@ -47,9 +47,9 @@ public class MovieDto {
         return title;
     }
 
-    public void setAverage(double average){this.average=average;}
+    public void setRating(double rating){this.rating=rating;}
 
-    public double getAverage(){return average;}
+    public double getRating(){return rating;}
     public void setTitle(String title) {
         this.title = title;
     }
