@@ -21,6 +21,8 @@ public class MovieDto {
     @NotNull
     private String country;
 
+    private double rating;
+
     public MovieDto(){
 
     }
@@ -45,6 +47,9 @@ public class MovieDto {
         return title;
     }
 
+    public void setRating(double rating){this.rating=rating;}
+
+    public double getRating(){return rating;}
     public void setTitle(String title) {
         this.title = title;
     }
