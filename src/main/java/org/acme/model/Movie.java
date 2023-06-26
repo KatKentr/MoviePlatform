@@ -30,9 +30,11 @@ public class Movie  {      //In case of extending the PanacheEntity: We are not 
 
 
    @Column(name="rates_number")
+   @JsonIgnore
    private int ratesCount;
 
    @Column(name="rates_sum")
+   @JsonIgnore
    private int sum;
 
    @Transient              //not mapped to db
