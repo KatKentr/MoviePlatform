@@ -141,6 +141,29 @@ public class UserServiceTest {
 
 
      //unfollow method: similar with follow 3 test cases
+     @Test
+     public void unfollow_UsertoUnfollowNotFound(){
+
+         Long userIdToUnfollow=2L;
+         when(userRepository.findByIdOptional(user.getId())).thenReturn(Optional.ofNullable(user));
+         when(userRepository.findByIdOptional(userIdToUnfollow)).thenReturn(Optional.empty());
+         Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+             userService.unfollow(user.getId(),userIdToUnfollow);
+         });
+         Assertions.assertTrue(exception.getMessage().contains("user with id: "+userIdToUnfollow+" not found"));
+     }
+
+    @Test
+    public void unfollow_UserNotFound(){
+
+        User userToUnfollow=new User(2L,"random","random@example.com");
+        when(userRepository.findByIdOptional(user.getId())).thenReturn(Optional.empty());
+        when(userRepository.findByIdOptional(userToUnfollow.getId())).thenReturn(Optional.ofNullable(userToUnfollow));
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            userService.unfollow(user.getId(),userToUnfollow.getId());
+        });
+        Assertions.assertTrue(exception.getMessage().contains("user with id: "+user.getId()+" not found"));
+    }
 
 
     //getFollowersOfUser
