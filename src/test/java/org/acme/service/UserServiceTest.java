@@ -135,6 +135,7 @@ public class UserServiceTest {
         userService.follow(user.getId(),usernameToFollow);
         assertEquals(1,user.getFollowing().size());     //We check the size of the followings set
         assertTrue(user.getFollowing().contains(userToFollow));
+        assertTrue(userToFollow.getFollowers().contains(user));
         //user.getFollowing().stream().forEach( x -> System.out.println(x.getUsername()));
 
     }
