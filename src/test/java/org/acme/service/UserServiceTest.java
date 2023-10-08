@@ -166,6 +166,20 @@ public class UserServiceTest {
     }
 
 
+    @Test
+    public void unfollowAUser_succesfull() throws ResourceNotFoundException {
+        User userToUnfollow=testUtils.createValidUserwithRoleAdmin();
+        when(userRepository.findByIdOptional(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findByIdOptional(userToUnfollow.getId())).thenReturn(Optional.ofNullable(userToUnfollow));
+        user.addFollowing(userToUnfollow);
+        userService.unfollow(user.getId(),userToUnfollow.getId());
+        assertEquals(0,user.getFollowing().size());     //We check the size of the followings set
+        assertTrue(!user.getFollowing().contains(userToUnfollow));
+        assertTrue(!userToUnfollow.getFollowers().contains(user));
+
+    }
+
+
     //getFollowersOfUser
 
     @Test
